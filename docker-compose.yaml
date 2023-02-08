@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  backend:
+    build: .
+    # build:
+    #   context: ./backend
+    #   dockerfile: Dockerfile
+    #   args:
+    #     some-arg: 1
+    ports:
+      - '3000:3000'
+    env_file: 
+      - ./.env
+    container_name: ocpServer
+    volumes:
+      - .:/app

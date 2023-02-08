@@ -1,6 +1,7 @@
-Build: docker build -t ocpserver .
 
-Run:  docker run -d -p 3000:3000 --name ocpserver ocpserver
+Run:  docker compose up
+
+shutdown: docker compose down
 
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
