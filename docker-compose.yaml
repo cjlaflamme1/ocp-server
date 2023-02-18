@@ -1,11 +1,31 @@
 version: "3.8"
+
 services:
+  mysqldb:
+    image: mysql:5.7
+    restart: always
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootroot
+      - MYSQL_DATABASE=ocp_local
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db:/var/lib/mysql
   backend:
     build: .
+    depends_on:
+      - mysqldb
     ports:
       - '3000:3000'
+    expose:
+      - 3000
     env_file: 
-      - ./.env
+      - .env
     container_name: ocpServer
+    stdin_open: true
+    tty: true
     volumes:
       - .:/app
+    environment:
+      - DB_HOST=mysqldb

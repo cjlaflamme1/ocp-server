@@ -36,3 +36,7 @@ lerna-debug.log*
 
 .env
 ./.env
+./ormconfig.json
+ormconfig.json
+/mysql
+/db
