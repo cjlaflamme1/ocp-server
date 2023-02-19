@@ -5,6 +5,10 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { RefreshTokenModule } from './refresh-token/refresh-token.module';
+import { LosenordModule } from './losenord/losenord.module';
 
 @Module({
   imports: [
@@ -21,6 +25,10 @@ import { AppService } from './app.service';
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: false,
     }),
+    AuthModule,
+    UserModule,
+    RefreshTokenModule,
+    LosenordModule,
   ],
   controllers: [AppController],
   providers: [AppService],
