@@ -2,10 +2,10 @@ FROM node:16
 
 WORKDIR /app
 
-COPY . /app
+RUN npm install -g @nestjs/cli
 
-RUN npm install
+COPY . /app
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:docker"]
