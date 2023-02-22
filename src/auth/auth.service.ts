@@ -42,7 +42,7 @@ export class AuthService {
         expiresIn: '7d',
       },
     );
-    this.refreshTokenService.create(payload.email, refreshToken);
+    await this.refreshTokenService.create(payload.email, refreshToken);
     return {
       email: payload.email,
       accessToken: this.jwtService.sign(payload),
