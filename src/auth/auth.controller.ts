@@ -10,7 +10,6 @@ export class AuthController {
 
   @Post('signup')
   signUp(@Body() createUserDto: CreateUserDto) {
-    this.logger.log('ping signup');
     return this.authService.signUp(createUserDto);
   }
 

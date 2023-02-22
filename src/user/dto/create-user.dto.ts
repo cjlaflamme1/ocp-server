@@ -5,4 +5,5 @@ export class CreateUserDto {
   firstName: string;
   lastName: string;
   losenord: string;
+  password: string;
 }

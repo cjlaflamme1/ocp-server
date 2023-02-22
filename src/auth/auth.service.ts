@@ -32,7 +32,9 @@ export class AuthService {
         HttpStatus.CONFLICT,
       );
     }
-    user.losenord = await bcrypt.hash(user.losenord, saltOrRounds);
+    this.logger.log(user.password);
+    user.losenord = await bcrypt.hash(user.password, saltOrRounds);
+    this.logger.log(user.losenord);
     const { id, email } = await this.userService.create(user);
     const payload = { email: email, sub: id };
 
@@ -60,7 +62,7 @@ export class AuthService {
         expiresIn: '7d',
       },
     );
-    this.refreshTokenService.create(payload.email, refreshToken);
+    await this.refreshTokenService.create(payload.email, refreshToken);
     return {
       email: payload.email,
       accessToken: this.jwtService.sign(payload),
@@ -119,6 +121,7 @@ export class AuthService {
     this.logger.log('validating');
     const user = await this.userService.userLogIn(email);
     this.logger.log(user.email);
+    this.logger.log(user.losenord[0].losenord);
     const match = await bcrypt.compare(pass, user.losenord[0].losenord);
     this.logger.log(match);
 
