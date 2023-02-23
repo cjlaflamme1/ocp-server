@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
@@ -14,14 +14,17 @@ export class RefreshTokenService {
     private refreshTokenRepository: Repository<RefreshToken>,
     private userService: UserService,
   ) {}
+  logger = new Logger(RefreshTokenService.name);
 
   async create(userEmail: string, newToken: string) {
     const hashedToken = await bcrypt.hash(newToken, 10);
     const user = await this.userService.findOneByEmail(userEmail);
-    return this.refreshTokenRepository.save({
+    const newCreatedToken = await this.refreshTokenRepository.save({
       user,
       token: hashedToken,
     });
+
+    return newCreatedToken;
   }
 
   async findByUser(user: User) {
@@ -35,6 +38,7 @@ export class RefreshTokenService {
         user: true,
       },
     });
+
     return token;
   }
 
