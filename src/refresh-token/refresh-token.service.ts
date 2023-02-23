@@ -23,7 +23,7 @@ export class RefreshTokenService {
       user,
       token: hashedToken,
     });
-    this.logger.log(JSON.stringify(newCreatedToken));
+
     return newCreatedToken;
   }
 
@@ -38,7 +38,7 @@ export class RefreshTokenService {
         user: true,
       },
     });
-    this.logger.log(`Current Tokens: ${JSON.stringify(token)}`);
+
     return token;
   }
 

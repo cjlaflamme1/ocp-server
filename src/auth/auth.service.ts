@@ -32,9 +32,8 @@ export class AuthService {
         HttpStatus.CONFLICT,
       );
     }
-    this.logger.log(user.password);
     user.losenord = await bcrypt.hash(user.password, saltOrRounds);
-    this.logger.log(user.losenord);
+
     const { id, email } = await this.userService.create(user);
     const payload = { email: email, sub: id };
 
@@ -73,11 +72,11 @@ export class AuthService {
   async createAccessTokenFromRefreshToken(refresh: any) {
     try {
       const decoded: any = this.jwtService.decode(refresh);
-      this.logger.log(decoded);
+
       if (!decoded) {
         throw new Error();
       }
-      this.logger.log('getting user');
+
       const user = await this.userService.findOneByEmail(decoded.email);
       if (!user) {
         throw new HttpException(
@@ -85,7 +84,6 @@ export class AuthService {
           HttpStatus.NOT_FOUND,
         );
       }
-      this.logger.log('getting tokens');
 
       const userRefreshTokens = await this.refreshTokenService.findByUser(user);
       let matchingRefreshToken = '';
@@ -99,7 +97,6 @@ export class AuthService {
           return;
         }),
       );
-      this.logger.log('checking returned tokens');
 
       if (!matchingRefreshToken) {
         throw new UnauthorizedException('Invalid Token');
@@ -112,18 +109,13 @@ export class AuthService {
         }),
       };
     } catch (e) {
-      this.logger.log(e);
       throw new UnauthorizedException('Invalid Token');
     }
   }
 
   async validateUser(email: string, pass: string): Promise<any> {
-    this.logger.log('validating');
     const user = await this.userService.userLogIn(email);
-    this.logger.log(user.email);
-    this.logger.log(user.losenord[0].losenord);
     const match = await bcrypt.compare(pass, user.losenord[0].losenord);
-    this.logger.log(match);
 
     if (match) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
