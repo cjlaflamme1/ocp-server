@@ -20,10 +20,11 @@ export class S3Service {
 
   putImageObjectSignedUrl = async (
     imageFileName: string,
-    imageDirectory: string,
     imageFileType: string,
+    imageDirectory: string,
   ) => {
     try {
+      this.logger.log(imageDirectory);
       const imageBucketParams = {
         Bucket: 'outdoor-community-project',
         Key: `${imageDirectory}/${imageFileName}`,
@@ -40,14 +41,11 @@ export class S3Service {
     }
   };
 
-  getImageObjectSignedUrl = async (
-    imageFileName: string,
-    imageDirectory: string,
-  ) => {
+  getImageObjectSignedUrl = async (imageFileName: string) => {
     try {
       const imageBucketParams = {
         Bucket: 'outdoor-community-project',
-        Key: `${imageDirectory}/${imageFileName}`,
+        Key: `${imageFileName}`,
       };
       const command = new GetObjectCommand(imageBucketParams);
       const signedUrl = await getSignedUrl(this.s3Client, command, {

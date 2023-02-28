@@ -17,8 +17,8 @@ export class AppController {
 
   @Get('image/:fileName')
   @UseGuards(JwtAuthGuard)
-  getImagePath(@Param('fileName') fileName: string, fileDirectory: string) {
-    return this.s3Service.getImageObjectSignedUrl(fileName, fileDirectory);
+  getImagePath(@Param('fileName') fileName: string) {
+    return this.s3Service.getImageObjectSignedUrl(fileName);
   }
 
   @Post('image')
