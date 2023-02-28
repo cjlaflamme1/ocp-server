@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { returnRelationsObject } from 'src/helpers/relationArrayToObject';
 import { Losenord } from 'src/losenord/entities/losenord.entity';
 import { LosenordService } from 'src/losenord/losenord.service';
+import { S3Service } from 'src/services/s3/s3.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,6 +15,7 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private losenordService: LosenordService,
+    private s3Service: S3Service,
   ) {}
   create(createUserDto: CreateUserDto) {
     const newUser = new User();
@@ -29,14 +31,28 @@ export class UserService {
     return this.userRepository.save(newUser);
   }
 
-  findAll(relations: string[] = []) {
+  findCurrent(relations: string[] = []) {
     return this.userRepository.find({
       relations: returnRelationsObject(relations),
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (user) {
+      let imageGetUrl = '';
+      if (user.profilePhoto) {
+        imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+          user.profilePhoto,
+        );
+      }
+      return { ...user, imageGetUrl };
+    }
+    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -49,7 +65,15 @@ export class UserService {
         id: id,
       },
     });
-    return user;
+    if (user) {
+      let imageGetUrl = '';
+      if (user.profilePhoto) {
+        imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+          user.profilePhoto,
+        );
+      }
+      return { ...user, imageGetUrl };
+    }
   }
 
   remove(id: number) {
@@ -61,8 +85,26 @@ export class UserService {
       where: {
         email,
       },
-      relations,
+      relations: returnRelationsObject(relations),
     });
+  }
+
+  async findByEmailWithImage(email: string, relations: string[] = []) {
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+      relations: returnRelationsObject(relations),
+    });
+    if (user) {
+      let imageGetUrl = '';
+      if (user.profilePhoto) {
+        imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+          user.profilePhoto,
+        );
+      }
+      return { ...user, imageGetUrl };
+    }
   }
 
   async userLogIn(email: string) {

@@ -49,7 +49,7 @@ export class S3Service {
       };
       const command = new GetObjectCommand(imageBucketParams);
       const signedUrl = await getSignedUrl(this.s3Client, command, {
-        expiresIn: 20000,
+        expiresIn: 604800,
       }).catch((e) => this.logger.log(e));
       return signedUrl;
     } catch (e) {
