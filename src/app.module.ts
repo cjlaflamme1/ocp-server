@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 import { LosenordModule } from './losenord/losenord.module';
+import { S3Service } from './services/s3/s3.service';
 
 @Module({
   imports: [
@@ -31,6 +32,6 @@ import { LosenordModule } from './losenord/losenord.module';
     LosenordModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, S3Service],
 })
 export class AppModule {}
