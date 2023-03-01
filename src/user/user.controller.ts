@@ -24,19 +24,19 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Get()
-  findAll(@Req() req) {
-    return this.userService.findOneByEmail(req.user.email);
+  @Get('/current')
+  findCurrent(@Req() req) {
+    return this.userService.findByEmailWithImage(req.user.email);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.userService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+    return this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id')
