@@ -10,6 +10,8 @@ import { UserModule } from './user/user.module';
 import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 import { LosenordModule } from './losenord/losenord.module';
 import { S3Service } from './services/s3/s3.service';
+import { ActivityTypesModule } from './activity-types/activity-types.module';
+import { UsersActivityModule } from './users-activity/users-activity.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { S3Service } from './services/s3/s3.service';
     UserModule,
     RefreshTokenModule,
     LosenordModule,
+    ActivityTypesModule,
+    UsersActivityModule,
   ],
   controllers: [AppController],
   providers: [AppService, S3Service],
