@@ -61,12 +61,29 @@ export class UsersActivityService {
     }
   }
 
-  findAll() {
-    return `This action returns all usersActivity`;
-  }
+  // findAll() {
+  //   return `This action returns all usersActivity`;
+  // }
 
-  findOne(id: number) {
-    return `This action returns a #${id} usersActivity`;
+  async findOne(id: string) {
+    const activity = await this.usersActivityRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (activity) {
+      let getImageUrl = '';
+      if (activity.coverPhoto) {
+        getImageUrl = await this.s3Service.getImageObjectSignedUrl(
+          activity.coverPhoto,
+        );
+      }
+      return {
+        ...activity,
+        getImageUrl,
+      };
+    }
+    return activity;
   }
 
   update(id: number, updateUsersActivityDto: UpdateUsersActivityDto) {

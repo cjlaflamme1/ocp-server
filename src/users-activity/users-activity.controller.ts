@@ -34,19 +34,19 @@ export class UsersActivityController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersActivityService.findOne(+id);
+    return this.usersActivityService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUsersActivityDto: UpdateUsersActivityDto,
-  ) {
-    return this.usersActivityService.update(+id, updateUsersActivityDto);
-  }
+  // @Patch(':id')
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() updateUsersActivityDto: UpdateUsersActivityDto,
+  // ) {
+  //   return this.usersActivityService.update(+id, updateUsersActivityDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersActivityService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.usersActivityService.remove(+id);
+  // }
 }
