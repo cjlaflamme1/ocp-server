@@ -16,11 +16,15 @@ export class ActivityTypesService {
   }
 
   findAll() {
-    return `This action returns all activityTypes`;
+    return this.activityTypeRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} activityType`;
+  findOne(id: string) {
+    return this.activityTypeRepository.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
   update(id: number, updateActivityTypeDto: UpdateActivityTypeDto) {

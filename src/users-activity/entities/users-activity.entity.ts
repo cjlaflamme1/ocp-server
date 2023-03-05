@@ -61,6 +61,11 @@ export class UsersActivity extends BaseEntity {
   })
   provideMentorshipDetails: string;
 
+  @Column({
+    nullable: true,
+  })
+  coverPhoto: string;
+
   @ManyToOne(() => ActivityType, (activityType) => activityType.usersActivity, {
     eager: true,
   })

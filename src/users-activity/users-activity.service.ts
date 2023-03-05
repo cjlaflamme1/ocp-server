@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ActivityTypesService } from 'src/activity-types/activity-types.service';
+import { S3Service } from 'src/services/s3/s3.service';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { CreateUsersActivityDto } from './dto/create-users-activity.dto';
@@ -11,10 +13,52 @@ export class UsersActivityService {
   constructor(
     @InjectRepository(UsersActivity)
     private usersActivityRepository: Repository<UsersActivity>,
+    private s3Service: S3Service,
+    private activityTypesService: ActivityTypesService,
     private userService: UserService,
   ) {}
-  create(createUsersActivityDto: CreateUsersActivityDto) {
-    return 'This action adds a new usersActivity';
+  logger = new Logger(UsersActivityService.name);
+  async create(
+    createUsersActivityDto: CreateUsersActivityDto,
+    userEmail: string,
+  ) {
+    const user = await this.userService.findOneByEmail(userEmail);
+    return this.usersActivityRepository.save({
+      ...createUsersActivityDto,
+      activityType: await this.activityTypesService.findOne(
+        createUsersActivityDto.activityTypeId,
+      ),
+      user,
+    });
+  }
+
+  async findAllForUser(email: string) {
+    const activities = await this.usersActivityRepository.find({
+      where: {
+        user: {
+          email,
+        },
+      },
+    });
+    this.logger.log(JSON.stringify(activities));
+    if (activities && activities.length > 0) {
+      const returnedActivities = [];
+      await Promise.all(
+        activities.map(async (activity) => {
+          let getImageUrl = '';
+          if (activity.coverPhoto) {
+            getImageUrl = await this.s3Service.getImageObjectSignedUrl(
+              activity.coverPhoto,
+            );
+          }
+          returnedActivities.push({
+            ...activity,
+            getImageUrl,
+          });
+        }),
+      );
+      return returnedActivities;
+    }
   }
 
   findAll() {
