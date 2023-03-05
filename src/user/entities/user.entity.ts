@@ -1,17 +1,14 @@
 import { Losenord } from 'src/losenord/entities/losenord.entity';
+import { UsersActivity } from 'src/users-activity/entities/users-activity.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToMany,
-  OneToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  JoinColumn,
-  JoinTable,
 } from 'typeorm';
 
 @Entity()
@@ -49,6 +46,9 @@ export class User extends BaseEntity {
     cascade: ['insert', 'soft-remove'],
   })
   losenord: Losenord[];
+
+  @OneToMany(() => UsersActivity, (usersActivity) => usersActivity.user)
+  activities: UsersActivity[];
 
   @CreateDateColumn()
   createdAt: Date;

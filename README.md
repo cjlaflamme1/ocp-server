@@ -3,7 +3,9 @@ Run:  docker compose up
 
 shutdown: docker compose down
 
-generate migrations: npx typeorm migration:generate ./migrations/addUserLocation -d /app/dist/ormconfig.js
+generate migrations: npx typeorm migration:generate ./migrations/addActivitiesCoverImage -d /app/dist/ormconfig.js
+
+create blank migration: npx typeorm migration:create ./migrations/addActivitySeed
 
 run migrations:npx typeorm migration:run -d /app/dist/ormconfig.js
 

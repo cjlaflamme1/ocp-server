@@ -26,7 +26,9 @@ export class UserController {
 
   @Get('/current')
   findCurrent(@Req() req) {
-    return this.userService.findByEmailWithImage(req.user.email);
+    return this.userService.findByEmailWithImage(req.user.email, [
+      'activities',
+    ]);
   }
 
   @Get(':id')
