@@ -37,13 +37,13 @@ export class UsersActivityController {
     return this.usersActivityService.findOne(id);
   }
 
-  // @Patch(':id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateUsersActivityDto: UpdateUsersActivityDto,
-  // ) {
-  //   return this.usersActivityService.update(+id, updateUsersActivityDto);
-  // }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateUsersActivityDto: UpdateUsersActivityDto,
+  ) {
+    return this.usersActivityService.update(id, updateUsersActivityDto);
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ActivityTypesService } from 'src/activity-types/activity-types.service';
 import { S3Service } from 'src/services/s3/s3.service';
@@ -86,8 +86,15 @@ export class UsersActivityService {
     return activity;
   }
 
-  update(id: number, updateUsersActivityDto: UpdateUsersActivityDto) {
-    return `This action updates a #${id} usersActivity`;
+  async update(id: string, updateUsersActivityDto: UpdateUsersActivityDto) {
+    const activityToUpdate = await this.usersActivityRepository.save({
+      id,
+      ...updateUsersActivityDto,
+    });
+    if (activityToUpdate) {
+      return this.findOne(id);
+    }
+    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
   remove(id: number) {
