@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ActivityTypesService } from 'src/activity-types/activity-types.service';
 import { S3Service } from 'src/services/s3/s3.service';
@@ -40,7 +40,6 @@ export class UsersActivityService {
         },
       },
     });
-    this.logger.log(JSON.stringify(activities));
     if (activities && activities.length > 0) {
       const returnedActivities = [];
       await Promise.all(
@@ -86,11 +85,26 @@ export class UsersActivityService {
     return activity;
   }
 
-  update(id: number, updateUsersActivityDto: UpdateUsersActivityDto) {
-    return `This action updates a #${id} usersActivity`;
+  async update(id: string, updateUsersActivityDto: UpdateUsersActivityDto) {
+    const activityToUpdate = await this.usersActivityRepository.save({
+      id,
+      ...updateUsersActivityDto,
+    });
+    if (activityToUpdate) {
+      return this.findOne(id);
+    }
+    throw new HttpException('Activity not found', HttpStatus.NOT_FOUND);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} usersActivity`;
+  async remove(id: string) {
+    const activity = await this.usersActivityRepository.find({
+      where: {
+        id,
+      },
+    });
+    if (activity) {
+      return this.usersActivityRepository.softRemove(activity);
+    }
+    throw new HttpException('Activity not found', HttpStatus.NOT_FOUND);
   }
 }
