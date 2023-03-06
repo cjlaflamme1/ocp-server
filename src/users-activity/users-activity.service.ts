@@ -40,7 +40,6 @@ export class UsersActivityService {
         },
       },
     });
-    this.logger.log(JSON.stringify(activities));
     if (activities && activities.length > 0) {
       const returnedActivities = [];
       await Promise.all(

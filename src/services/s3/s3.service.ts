@@ -24,7 +24,6 @@ export class S3Service {
     imageDirectory: string,
   ) => {
     try {
-      this.logger.log(imageDirectory);
       const imageBucketParams = {
         Bucket: 'outdoor-community-project',
         Key: `${imageDirectory}/${imageFileName}`,
