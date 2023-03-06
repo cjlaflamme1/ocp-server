@@ -94,10 +94,18 @@ export class UsersActivityService {
     if (activityToUpdate) {
       return this.findOne(id);
     }
-    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    throw new HttpException('Activity not found', HttpStatus.NOT_FOUND);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} usersActivity`;
+  async remove(id: string) {
+    const activity = await this.usersActivityRepository.find({
+      where: {
+        id,
+      },
+    });
+    if (activity) {
+      return this.usersActivityRepository.softRemove(activity);
+    }
+    throw new HttpException('Activity not found', HttpStatus.NOT_FOUND);
   }
 }
