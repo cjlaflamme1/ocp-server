@@ -26,6 +26,7 @@ export class AuthService {
 
   async signUp(user: CreateUserDto) {
     this.logger.log('signup service hit');
+    this.logger.log(JSON.stringify(user));
     const userCheck = await this.userService.findOneByEmail(user.email);
     if (userCheck) {
       throw new HttpException(
