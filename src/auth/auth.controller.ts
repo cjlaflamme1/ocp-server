@@ -10,6 +10,7 @@ export class AuthController {
 
   @Post('signup')
   signUp(@Body() createUserDto: CreateUserDto) {
+    this.logger.log('signup controller hit');
     return this.authService.signUp(createUserDto);
   }
 
