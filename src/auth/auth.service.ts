@@ -25,8 +25,6 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   async signUp(user: CreateUserDto) {
-    this.logger.log('signup service hit');
-    this.logger.log(JSON.stringify(user));
     const userCheck = await this.userService.findOneByEmail(user.email);
     if (userCheck) {
       throw new HttpException(
@@ -34,12 +32,11 @@ export class AuthService {
         HttpStatus.CONFLICT,
       );
     }
-    this.logger.log('no user found, hashing pw');
     user.losenord = await bcrypt.hash(user.password, saltOrRounds);
-    this.logger.log('creating user');
+
     const { id, email } = await this.userService.create(user);
     const payload = { email: email, sub: id };
-    this.logger.log('creating refresh token');
+
     const refreshToken = this.jwtService.sign(
       { email: payload.email },
       {
@@ -47,7 +44,7 @@ export class AuthService {
       },
     );
     await this.refreshTokenService.create(payload.email, refreshToken);
-    this.logger.log('returning payload');
+
     return {
       email: payload.email,
       accessToken: this.jwtService.sign(payload),
