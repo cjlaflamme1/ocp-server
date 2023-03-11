@@ -55,6 +55,14 @@ export class UserService {
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
+  findOneNoImage(id: string) {
+    return this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     await this.userRepository.save({
       id: id,

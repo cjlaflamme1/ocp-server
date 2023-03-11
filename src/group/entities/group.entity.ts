@@ -36,7 +36,13 @@ export class Group extends BaseEntity {
   @ManyToMany(() => User, (user) => user.groups)
   users: User[];
 
-  @OneToMany(() => GroupInvitation, (groupInvitation) => groupInvitation.group)
+  @OneToMany(
+    () => GroupInvitation,
+    (groupInvitation) => groupInvitation.group,
+    {
+      cascade: ['insert'],
+    },
+  )
   pendingInvitations: GroupInvitation[];
 
   @CreateDateColumn()
