@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateGroupInvitationDto } from 'src/group-invitation/dto/create-group-invitation.dto';
+import { returnRelationsObject } from 'src/helpers/relationArrayToObject';
+import {
+  DbQueryService,
+  QueryDetails,
+} from 'src/services/db-query/db-query.service';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { CreateGroupDto, IncomingGroupDto } from './dto/create-group.dto';
@@ -13,6 +18,7 @@ export class GroupService {
     @InjectRepository(Group)
     private groupRepository: Repository<Group>,
     private userService: UserService,
+    private dbQueryService: DbQueryService,
   ) {}
   async create(createGroupDto: IncomingGroupDto, requestByEmail: string) {
     const creator = await this.userService.findOneByEmail(requestByEmail);
@@ -39,8 +45,12 @@ export class GroupService {
     return this.groupRepository.save(newGroup);
   }
 
-  findAll() {
-    return this.groupRepository.find();
+  findAll(queryFormatted: QueryDetails, relations: string[] = []) {
+    const query = this.dbQueryService.queryBuilder(queryFormatted);
+    return this.groupRepository.findAndCount({
+      ...query,
+      relations: returnRelationsObject(relations),
+    });
   }
 
   findOne(id: string) {

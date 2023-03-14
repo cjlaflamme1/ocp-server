@@ -8,11 +8,13 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupDto, IncomingGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { QueryDetails } from 'src/services/db-query/db-query.service';
 
 @Controller('group')
 @UseGuards(JwtAuthGuard)
@@ -25,8 +27,9 @@ export class GroupController {
   }
 
   @Get()
-  findAll() {
-    return this.groupService.findAll();
+  findAll(@Query() query, @Req() req) {
+    const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
+    return this.groupService.findAll(queryFormatted);
   }
 
   @Get(':id')

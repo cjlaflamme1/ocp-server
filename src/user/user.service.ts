@@ -1,8 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { returnRelationsObject } from 'src/helpers/relationArrayToObject';
 import { Losenord } from 'src/losenord/entities/losenord.entity';
 import { LosenordService } from 'src/losenord/losenord.service';
+import {
+  DbQueryService,
+  QueryDetails,
+} from 'src/services/db-query/db-query.service';
 import { S3Service } from 'src/services/s3/s3.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,7 +20,9 @@ export class UserService {
     private userRepository: Repository<User>,
     private losenordService: LosenordService,
     private s3Service: S3Service,
+    private dbQueryService: DbQueryService,
   ) {}
+  logger = new Logger(UserService.name);
   create(createUserDto: CreateUserDto) {
     const newUser = new User();
     newUser.email = createUserDto.email;
@@ -35,6 +41,38 @@ export class UserService {
     return this.userRepository.find({
       relations: returnRelationsObject(relations),
     });
+  }
+
+  async findAll(queryFormatted: QueryDetails, relations: string[] = []) {
+    const query = this.dbQueryService.queryBuilder(queryFormatted);
+    const rawUserList = await this.userRepository.findAndCount({
+      ...query,
+      relations: returnRelationsObject(relations),
+      select: ['id', 'firstName', 'lastName', 'profilePhoto'],
+    });
+    if (rawUserList && rawUserList[1] > 0) {
+      const formattedUser = await Promise.all(
+        rawUserList[0].map(async (user) => {
+          if (user) {
+            let imageGetUrl = '';
+            if (user.profilePhoto) {
+              imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+                user.profilePhoto,
+              );
+            }
+            return { ...user, imageGetUrl };
+          }
+        }),
+      );
+      return {
+        users: formattedUser,
+        count: rawUserList[1],
+      };
+    }
+    return {
+      users: rawUserList[0],
+      count: rawUserList[1],
+    };
   }
 
   async findOne(id: string) {

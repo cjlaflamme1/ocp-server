@@ -14,6 +14,7 @@ import { ActivityTypesModule } from './activity-types/activity-types.module';
 import { UsersActivityModule } from './users-activity/users-activity.module';
 import { GroupModule } from './group/group.module';
 import { GroupInvitationModule } from './group-invitation/group-invitation.module';
+import { DbQueryService } from './services/db-query/db-query.service';
 
 @Module({
   imports: [
@@ -41,6 +42,6 @@ import { GroupInvitationModule } from './group-invitation/group-invitation.modul
     GroupInvitationModule,
   ],
   controllers: [AppController],
-  providers: [AppService, S3Service],
+  providers: [AppService, S3Service, DbQueryService],
 })
 export class AppModule {}

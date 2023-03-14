@@ -8,20 +8,31 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
+  Logger,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { QueryDetails } from 'src/services/db-query/db-query.service';
 
 @Controller('user')
 @UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
+  logger = new Logger(UserController.name);
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
+  }
+
+  @Get()
+  findAll(@Query() query, @Req() req) {
+    this.logger.log(JSON.stringify(query));
+    const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
+    return this.userService.findAll(queryFormatted);
   }
 
   @Get('/current')
