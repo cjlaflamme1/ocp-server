@@ -19,13 +19,14 @@ export class OrderBy {
 export class QueryDetails {
   pagination?: Pagination | null | undefined;
   filters?: Filter[] | null | undefined;
+  filteredWithOr?: boolean;
   orderBy?: OrderBy | null | undefined;
 }
 
 @Injectable()
 export class DbQueryService {
   queryBuilder = (query: QueryDetails) => {
-    const { pagination, filters, orderBy } = query;
+    const { pagination, filters, orderBy, filteredWithOr } = query;
     const baseQuery = {};
 
     if (pagination) {
@@ -38,7 +39,17 @@ export class DbQueryService {
       baseQuery['order'][orderBy.column] = orderBy.order;
     }
 
-    if (filters) {
+    if (filters && filteredWithOr) {
+      baseQuery['where'] = [];
+      filters.forEach((filter) => {
+        const strType = typeof filter.value === 'string';
+        const key = filter.name;
+        const value = strType ? Like(`%${filter.value}%`) : filter.value;
+        const filterOption = {};
+        filterOption[key] = value;
+        baseQuery['where'].push(filterOption);
+      });
+    } else if (filters) {
       baseQuery['where'] = {};
       filters.forEach((filter) => {
         const strType = typeof filter.value === 'string';
