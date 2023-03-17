@@ -59,6 +59,7 @@ export class User extends BaseEntity {
   adminForGroups: Group[];
 
   @ManyToMany(() => Group, (group) => group.users)
+  @JoinTable()
   groups: Group[];
 
   @OneToMany(

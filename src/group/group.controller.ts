@@ -9,6 +9,7 @@ import {
   UseGuards,
   Req,
   Query,
+  Logger,
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupDto, IncomingGroupDto } from './dto/create-group.dto';
@@ -20,7 +21,7 @@ import { QueryDetails } from 'src/services/db-query/db-query.service';
 @UseGuards(JwtAuthGuard)
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
-
+  logger = new Logger(GroupController.name);
   @Post()
   create(@Body() createGroupDto: IncomingGroupDto, @Req() req) {
     return this.groupService.create(createGroupDto, req.user.email);
@@ -29,7 +30,18 @@ export class GroupController {
   @Get()
   findAll(@Query() query, @Req() req) {
     const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
-    return this.groupService.findAll(queryFormatted);
+    return this.groupService.findAll(queryFormatted, ['users']);
+  }
+
+  @Get('/current')
+  findCurrent(@Query() query, @Req() req) {
+    this.logger.log(query);
+    const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
+    return this.groupService.findUserGroups(req.user.email, queryFormatted, [
+      'users',
+      'groupAdmins',
+    ]);
+    // return this.groupService.findUserGroups(req.user.email, queryFormatted);
   }
 
   @Get(':id')

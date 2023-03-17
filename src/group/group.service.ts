@@ -6,6 +6,7 @@ import {
   DbQueryService,
   QueryDetails,
 } from 'src/services/db-query/db-query.service';
+import { S3Service } from 'src/services/s3/s3.service';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { CreateGroupDto, IncomingGroupDto } from './dto/create-group.dto';
@@ -19,6 +20,7 @@ export class GroupService {
     private groupRepository: Repository<Group>,
     private userService: UserService,
     private dbQueryService: DbQueryService,
+    private s3Service: S3Service,
   ) {}
   async create(createGroupDto: IncomingGroupDto, requestByEmail: string) {
     const creator = await this.userService.findOneByEmail(requestByEmail);
@@ -45,12 +47,81 @@ export class GroupService {
     return this.groupRepository.save(newGroup);
   }
 
-  findAll(queryFormatted: QueryDetails, relations: string[] = []) {
+  async findUserGroups(
+    userEmail: string,
+    queryFormatted: QueryDetails,
+    relations: string[] = [],
+  ) {
+    const userGroups = await this.groupRepository.findAndCount({
+      where: [
+        {
+          groupAdmins: {
+            email: userEmail,
+          },
+        },
+        {
+          users: {
+            email: userEmail,
+          },
+        },
+      ],
+      ...queryFormatted,
+      relations: returnRelationsObject(relations),
+    });
+    if (userGroups && userGroups[1] > 0) {
+      const formattedGroups = await Promise.all(
+        userGroups[0].map(async (group) => {
+          if (group) {
+            let imageGetUrl = '';
+            if (group.coverPhoto) {
+              imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+                group.coverPhoto,
+              );
+            }
+            return { ...group, imageGetUrl };
+          }
+        }),
+      );
+      return {
+        groups: formattedGroups,
+        count: userGroups[1],
+      };
+    }
+    return {
+      groups: userGroups[0],
+      count: userGroups[1],
+    };
+  }
+
+  async findAll(queryFormatted: QueryDetails, relations: string[] = []) {
     const query = this.dbQueryService.queryBuilder(queryFormatted);
-    return this.groupRepository.findAndCount({
+    const allGroups = await this.groupRepository.findAndCount({
       ...query,
       relations: returnRelationsObject(relations),
     });
+    if (allGroups && allGroups[1] > 0) {
+      const formattedGroups = await Promise.all(
+        allGroups[0].map(async (group) => {
+          if (group) {
+            let imageGetUrl = '';
+            if (group.coverPhoto) {
+              imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+                group.coverPhoto,
+              );
+            }
+            return { ...group, imageGetUrl };
+          }
+        }),
+      );
+      return {
+        groups: formattedGroups,
+        count: allGroups[1],
+      };
+    }
+    return {
+      groups: allGroups[0],
+      count: allGroups[1],
+    };
   }
 
   findOne(id: string) {
