@@ -35,13 +35,11 @@ export class GroupController {
 
   @Get('/current')
   findCurrent(@Query() query, @Req() req) {
-    this.logger.log(query);
     const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
     return this.groupService.findUserGroups(req.user.email, queryFormatted, [
       'users',
       'groupAdmins',
     ]);
-    // return this.groupService.findUserGroups(req.user.email, queryFormatted);
   }
 
   @Get(':id')

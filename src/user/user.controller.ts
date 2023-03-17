@@ -30,7 +30,6 @@ export class UserController {
 
   @Get()
   findAll(@Query() query, @Req() req) {
-    this.logger.log(JSON.stringify(query));
     const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
     return this.userService.findAll(queryFormatted);
   }
