@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateGroupInvitationDto } from 'src/group-invitation/dto/create-group-invitation.dto';
 import { returnRelationsObject } from 'src/helpers/relationArrayToObject';
@@ -124,12 +124,23 @@ export class GroupService {
     };
   }
 
-  findOne(id: string) {
-    return this.groupRepository.findOne({
+  async findOne(id: string, relations: string[] = []) {
+    const group = await this.groupRepository.findOne({
       where: {
         id: id,
       },
+      relations: returnRelationsObject(relations),
     });
+    if (group) {
+      let imageGetUrl = '';
+      if (group.coverPhoto) {
+        imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+          group.coverPhoto,
+        );
+      }
+      return { ...group, imageGetUrl };
+    }
+    throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
   }
 
   update(id: number, updateGroupDto: UpdateGroupDto) {

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { GroupInvitationService } from './group-invitation.service';
 import { CreateGroupInvitationDto } from './dto/create-group-invitation.dto';
@@ -20,31 +21,34 @@ export class GroupInvitationController {
     private readonly groupInvitationService: GroupInvitationService,
   ) {}
 
-  @Post()
-  create(@Body() createGroupInvitationDto: CreateGroupInvitationDto) {
-    return this.groupInvitationService.create(createGroupInvitationDto);
-  }
+  // @Post()
+  // create(@Body() createGroupInvitationDto: CreateGroupInvitationDto) {
+  //   return this.groupInvitationService.create(createGroupInvitationDto);
+  // }
 
   @Get()
-  findAll() {
-    return this.groupInvitationService.findAll();
+  findAll(@Req() req) {
+    return this.groupInvitationService.findAll(req.user.email, [
+      'group',
+      'invitedBy',
+    ]);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.groupInvitationService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.groupInvitationService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateGroupInvitationDto: UpdateGroupInvitationDto,
-  ) {
-    return this.groupInvitationService.update(+id, updateGroupInvitationDto);
-  }
+  // @Patch(':id')
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() updateGroupInvitationDto: UpdateGroupInvitationDto,
+  // ) {
+  //   return this.groupInvitationService.update(+id, updateGroupInvitationDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.groupInvitationService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.groupInvitationService.remove(+id);
+  // }
 }

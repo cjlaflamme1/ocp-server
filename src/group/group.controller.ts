@@ -44,7 +44,11 @@ export class GroupController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.groupService.findOne(id);
+    return this.groupService.findOne(id, [
+      'users',
+      'groupAdmins',
+      'pendingInvitations',
+    ]);
   }
 
   @Patch(':id')
