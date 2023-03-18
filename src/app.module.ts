@@ -12,6 +12,9 @@ import { LosenordModule } from './losenord/losenord.module';
 import { S3Service } from './services/s3/s3.service';
 import { ActivityTypesModule } from './activity-types/activity-types.module';
 import { UsersActivityModule } from './users-activity/users-activity.module';
+import { GroupModule } from './group/group.module';
+import { GroupInvitationModule } from './group-invitation/group-invitation.module';
+import { DbQueryService } from './services/db-query/db-query.service';
 
 @Module({
   imports: [
@@ -35,8 +38,10 @@ import { UsersActivityModule } from './users-activity/users-activity.module';
     LosenordModule,
     ActivityTypesModule,
     UsersActivityModule,
+    GroupModule,
+    GroupInvitationModule,
   ],
   controllers: [AppController],
-  providers: [AppService, S3Service],
+  providers: [AppService, S3Service, DbQueryService],
 })
 export class AppModule {}
