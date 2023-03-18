@@ -1,9 +1,10 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { group } from 'console';
+import { GroupService } from 'src/group/group.service';
 import { returnRelationsObject } from 'src/helpers/relationArrayToObject';
 import { S3Service } from 'src/services/s3/s3.service';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateGroupInvitationDto } from './dto/create-group-invitation.dto';
 import { UpdateGroupInvitationDto } from './dto/update-group-invitation.dto';
 import { GroupInvitation } from './entities/group-invitation.entity';
@@ -14,6 +15,7 @@ export class GroupInvitationService {
     @InjectRepository(GroupInvitation)
     private groupInvitationRepository: Repository<GroupInvitation>,
     private s3Service: S3Service,
+    private groupService: GroupService,
   ) {}
   create(createGroupInvitationDto: CreateGroupInvitationDto) {
     return 'This action adds a new groupInvitation';
@@ -25,6 +27,7 @@ export class GroupInvitationService {
         invitedUser: {
           email: userEmail,
         },
+        accepted: IsNull(),
       },
       relations: returnRelationsObject(relations),
     });
@@ -51,8 +54,31 @@ export class GroupInvitationService {
     return `This action returns a #${id} groupInvitation`;
   }
 
-  update(id: number, updateGroupInvitationDto: UpdateGroupInvitationDto) {
-    return `This action updates a #${id} groupInvitation`;
+  async update(id: string, updateGroupInvitationDto: UpdateGroupInvitationDto) {
+    const invite = await this.groupInvitationRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        group: true,
+        invitedUser: true,
+      },
+    });
+    if (
+      invite &&
+      invite.group &&
+      !invite.accepted &&
+      updateGroupInvitationDto.accepted
+    ) {
+      await this.groupService.addUserToGroup(
+        invite.invitedUser.id,
+        invite.group.id,
+      );
+    }
+    return this.groupInvitationRepository.save({
+      id,
+      ...updateGroupInvitationDto,
+    });
   }
 
   remove(id: number) {

@@ -143,6 +143,28 @@ export class GroupService {
     throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
   }
 
+  async addUserToGroup(userId: string, groupId: string) {
+    const group = await this.groupRepository.findOne({
+      where: {
+        id: groupId,
+      },
+      relations: {
+        users: true,
+      },
+    });
+    const user = await this.userService.findOneNoImage(userId);
+    if (user && group) {
+      const userList = group.users;
+      userList.push(user);
+      const groupUpdated = await this.groupRepository.save({
+        id: group.id,
+        users: userList,
+      });
+      return groupUpdated;
+    }
+    return null;
+  }
+
   update(id: number, updateGroupDto: UpdateGroupDto) {
     return `This action updates a #${id} group`;
   }

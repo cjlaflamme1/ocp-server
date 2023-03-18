@@ -39,13 +39,13 @@ export class GroupInvitationController {
   //   return this.groupInvitationService.findOne(+id);
   // }
 
-  // @Patch(':id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateGroupInvitationDto: UpdateGroupInvitationDto,
-  // ) {
-  //   return this.groupInvitationService.update(+id, updateGroupInvitationDto);
-  // }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateGroupInvitationDto: UpdateGroupInvitationDto,
+  ) {
+    return this.groupInvitationService.update(id, updateGroupInvitationDto);
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {
