@@ -116,12 +116,13 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.userService.userLogIn(email);
-    const match = await bcrypt.compare(pass, user.losenord[0].losenord);
-
-    if (match) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { losenord, ...result } = user;
-      return result;
+    if (user && user.losenord && user.losenord.length > 0 && user.losenord[0]) {
+      const match = await bcrypt.compare(pass, user.losenord[0].losenord);
+      if (match) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { losenord, ...result } = user;
+        return result;
+      }
     }
     return null;
   }
