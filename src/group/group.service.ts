@@ -95,11 +95,7 @@ export class GroupService {
     };
   }
 
-  async findAll(
-    queryFormatted: QueryDetails,
-    userEmail: string,
-    relations: string[] = [],
-  ) {
+  async findAll(queryFormatted: QueryDetails, relations: string[] = []) {
     const query = this.dbQueryService.queryBuilder(queryFormatted);
     const allGroups = await this.groupRepository.findAndCount({
       ...query,

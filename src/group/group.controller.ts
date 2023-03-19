@@ -28,9 +28,9 @@ export class GroupController {
   }
 
   @Get()
-  findAll(@Query() query, @Req() req) {
+  findAll(@Query() query) {
     const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
-    return this.groupService.findAll(queryFormatted, req.user.email, ['users']);
+    return this.groupService.findAll(queryFormatted, ['users']);
   }
 
   @Get('/current')
