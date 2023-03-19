@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateGroupInvitationDto } from 'src/group-invitation/dto/create-group-invitation.dto';
 import { returnRelationsObject } from 'src/helpers/relationArrayToObject';
@@ -8,7 +8,7 @@ import {
 } from 'src/services/db-query/db-query.service';
 import { S3Service } from 'src/services/s3/s3.service';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CreateGroupDto, IncomingGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { Group } from './entities/group.entity';
@@ -22,6 +22,8 @@ export class GroupService {
     private dbQueryService: DbQueryService,
     private s3Service: S3Service,
   ) {}
+  logger = new Logger(GroupService.name);
+
   async create(createGroupDto: IncomingGroupDto, requestByEmail: string) {
     const creator = await this.userService.findOneByEmail(requestByEmail);
     const newGroup: CreateGroupDto = {
@@ -93,7 +95,11 @@ export class GroupService {
     };
   }
 
-  async findAll(queryFormatted: QueryDetails, relations: string[] = []) {
+  async findAll(
+    queryFormatted: QueryDetails,
+    userEmail: string,
+    relations: string[] = [],
+  ) {
     const query = this.dbQueryService.queryBuilder(queryFormatted);
     const allGroups = await this.groupRepository.findAndCount({
       ...query,
@@ -165,8 +171,39 @@ export class GroupService {
     return null;
   }
 
-  update(id: number, updateGroupDto: UpdateGroupDto) {
-    return `This action updates a #${id} group`;
+  async update(id: string, updateGroupDto: UpdateGroupDto) {
+    const group = await this.groupRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        users: true,
+        groupAdmins: true,
+      },
+    });
+    if (group) {
+      if (
+        updateGroupDto.addingUserIds &&
+        updateGroupDto.addingUserIds.length > 0
+      ) {
+        const users = await this.userService.findSeveralUsers(
+          updateGroupDto.addingUserIds,
+        );
+        const existingUsers = group.users ? group.users : [];
+        existingUsers.push(...users);
+        return this.groupRepository.save({
+          id: group.id,
+          users: existingUsers,
+          ...updateGroupDto,
+        });
+      } else {
+        return this.groupRepository.save({
+          id: group.id,
+          ...updateGroupDto,
+        });
+      }
+    }
+    throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
   }
 
   remove(id: number) {
