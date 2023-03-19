@@ -8,7 +8,7 @@ import {
   QueryDetails,
 } from 'src/services/db-query/db-query.service';
 import { S3Service } from 'src/services/s3/s3.service';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -73,6 +73,14 @@ export class UserService {
       users: rawUserList[0],
       count: rawUserList[1],
     };
+  }
+
+  findSeveralUsers(ids: string[]) {
+    return this.userRepository.find({
+      where: {
+        id: In(ids),
+      },
+    });
   }
 
   async findOne(id: string) {

@@ -28,7 +28,7 @@ export class GroupController {
   }
 
   @Get()
-  findAll(@Query() query, @Req() req) {
+  findAll(@Query() query) {
     const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
     return this.groupService.findAll(queryFormatted, ['users']);
   }
@@ -53,7 +53,7 @@ export class GroupController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
-    return this.groupService.update(+id, updateGroupDto);
+    return this.groupService.update(id, updateGroupDto);
   }
 
   @Delete(':id')
