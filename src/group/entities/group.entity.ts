@@ -1,4 +1,5 @@
 import { GroupInvitation } from 'src/group-invitation/entities/group-invitation.entity';
+import { GroupPost } from 'src/group-post/entities/group-post.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   BaseEntity,
@@ -44,6 +45,9 @@ export class Group extends BaseEntity {
     },
   )
   pendingInvitations: GroupInvitation[];
+
+  @OneToMany(() => GroupPost, (groupPost) => groupPost.group)
+  posts: GroupPost[];
 
   @CreateDateColumn()
   createdAt: Date;

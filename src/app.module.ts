@@ -15,6 +15,7 @@ import { UsersActivityModule } from './users-activity/users-activity.module';
 import { GroupModule } from './group/group.module';
 import { GroupInvitationModule } from './group-invitation/group-invitation.module';
 import { DbQueryService } from './services/db-query/db-query.service';
+import { GroupPostModule } from './group-post/group-post.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { DbQueryService } from './services/db-query/db-query.service';
     UsersActivityModule,
     GroupModule,
     GroupInvitationModule,
+    GroupPostModule,
   ],
   controllers: [AppController],
   providers: [AppService, S3Service, DbQueryService],
