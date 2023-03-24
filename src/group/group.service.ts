@@ -6,6 +6,7 @@ import {
   DbQueryService,
   QueryDetails,
 } from 'src/services/db-query/db-query.service';
+import { PushNotificationService } from 'src/services/push-notification/push-notification.service';
 import { S3Service } from 'src/services/s3/s3.service';
 import { UserService } from 'src/user/user.service';
 import { Not, Repository } from 'typeorm';
@@ -21,6 +22,7 @@ export class GroupService {
     private userService: UserService,
     private dbQueryService: DbQueryService,
     private s3Service: S3Service,
+    private pushNotificationService: PushNotificationService,
   ) {}
   logger = new Logger(GroupService.name);
 
@@ -46,6 +48,18 @@ export class GroupService {
             )
           : null,
     };
+    if (
+      createGroupDto.pendingInvitationUserIds &&
+      createGroupDto.pendingInvitationUserIds.length > 0
+    ) {
+      this.pushNotificationService.sendNotifications(
+        createGroupDto.pendingInvitationUserIds,
+        {
+          title: `You have been invited to: ${createGroupDto.title} `,
+          body: `You have been invited to ${createGroupDto.title} by ${creator.firstName} ${creator.lastName}.  Open the app and navigate groups to accept or deny.`,
+        },
+      );
+    }
     return this.groupRepository.save(newGroup);
   }
 

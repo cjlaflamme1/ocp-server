@@ -1,4 +1,5 @@
 import { GroupInvitation } from 'src/group-invitation/entities/group-invitation.entity';
+import { GroupPost } from 'src/group-post/entities/group-post.entity';
 import { Group } from 'src/group/entities/group.entity';
 import { Losenord } from 'src/losenord/entities/losenord.entity';
 import { UsersActivity } from 'src/users-activity/entities/users-activity.entity';
@@ -68,7 +69,8 @@ export class User extends BaseEntity {
   )
   groupInvitations: GroupInvitation[];
 
-  // group invitations one user to many invitations
+  @OneToMany(() => GroupPost, (groupPost) => groupPost.author)
+  groupPostsAuthored: GroupPost[];
 
   @CreateDateColumn()
   createdAt: Date;
