@@ -16,6 +16,7 @@ import { GroupModule } from './group/group.module';
 import { GroupInvitationModule } from './group-invitation/group-invitation.module';
 import { DbQueryService } from './services/db-query/db-query.service';
 import { GroupPostModule } from './group-post/group-post.module';
+import { PushNotificationService } from './services/push-notification/push-notification.service';
 
 @Module({
   imports: [
@@ -44,6 +45,6 @@ import { GroupPostModule } from './group-post/group-post.module';
     GroupPostModule,
   ],
   controllers: [AppController],
-  providers: [AppService, S3Service, DbQueryService],
+  providers: [AppService, S3Service, DbQueryService, PushNotificationService],
 })
 export class AppModule {}
