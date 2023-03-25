@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GroupService } from 'src/group/group.service';
 import { returnRelationsObject } from 'src/helpers/relationArrayToObject';
+import {
+  DbQueryService,
+  QueryDetails,
+} from 'src/services/db-query/db-query.service';
 import { S3Service } from 'src/services/s3/s3.service';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
@@ -17,6 +21,7 @@ export class GroupPostService {
     private userService: UserService,
     private groupService: GroupService,
     private s3Service: S3Service,
+    private dbQueryService: DbQueryService,
   ) {}
   async create(createGroupPostDto: CreateGroupPostDto, authorEmail: string) {
     const author = await this.userService.findOneByEmail(authorEmail);
@@ -29,16 +34,10 @@ export class GroupPostService {
     return post;
   }
 
-  async findAll(groupId: string, relations: string[] = []) {
+  async findAll(queryFormatted: QueryDetails, relations: string[] = []) {
+    const query = this.dbQueryService.queryBuilder(queryFormatted);
     const groupPosts = await this.groupPostRepository.findAndCount({
-      where: {
-        group: {
-          id: groupId,
-        },
-      },
-      order: {
-        createdAt: 'DESC',
-      },
+      ...query,
       relations: returnRelationsObject(relations),
     });
     if (groupPosts && groupPosts[1] > 0) {
@@ -70,15 +69,34 @@ export class GroupPostService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} groupPost`;
+  async findOne(id: string, relations: string[] = []) {
+    const post = await this.groupPostRepository.findOne({
+      where: {
+        id,
+      },
+      relations: returnRelationsObject(relations),
+    });
+    if (post) {
+      let imageGetUrl = '';
+      if (post.image) {
+        imageGetUrl = await this.s3Service.getImageObjectSignedUrl(post.image);
+      }
+      let authorImageUrl = '';
+      if (post.author && post.author.profilePhoto) {
+        authorImageUrl = await this.s3Service.getImageObjectSignedUrl(
+          post.author.profilePhoto,
+        );
+      }
+      return { ...post, imageGetUrl, authorImageUrl };
+    }
+    throw new HttpException('No post found', HttpStatus.NOT_FOUND);
   }
 
-  update(id: number, updateGroupPostDto: UpdateGroupPostDto) {
-    return `This action updates a #${id} groupPost`;
-  }
+  // update(id: number, updateGroupPostDto: UpdateGroupPostDto) {
+  //   return `This action updates a #${id} groupPost`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} groupPost`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} groupPost`;
+  // }
 }

@@ -15,6 +15,7 @@ import { GroupPostService } from './group-post.service';
 import { CreateGroupPostDto } from './dto/create-group-post.dto';
 import { UpdateGroupPostDto } from './dto/update-group-post.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { QueryDetails } from 'src/services/db-query/db-query.service';
 
 @Controller('group-post')
 @UseGuards(JwtAuthGuard)
@@ -27,15 +28,14 @@ export class GroupPostController {
   }
 
   @Get()
-  findAll(@Query('groupId') groupId: string) {
-    this.logger.log('get groups posts');
-    return this.groupPostService.findAll(groupId, ['author']);
+  findAll(@Query() query) {
+    const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
+    return this.groupPostService.findAll(queryFormatted, ['author']);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    this.logger.log('get single post');
-    // return this.groupPostService.findOne(+id);
+    return this.groupPostService.findOne(id, ['author']);
   }
 
   // @Patch(':id')
