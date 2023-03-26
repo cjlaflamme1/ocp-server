@@ -35,7 +35,11 @@ export class GroupPostController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.groupPostService.findOne(id, ['author']);
+    return this.groupPostService.findOne(id, [
+      'author',
+      'responses',
+      'responses.author',
+    ]);
   }
 
   // @Patch(':id')
