@@ -69,12 +69,12 @@ export class GroupPostService {
     };
   }
 
-  async findOne(id: string, relations: string[] = []) {
+  async findOne(id: string, relations: object = {}) {
     const post = await this.groupPostRepository.findOne({
       where: {
         id,
       },
-      relations: returnRelationsObject(relations),
+      relations,
     });
     if (post) {
       let imageGetUrl = '';
