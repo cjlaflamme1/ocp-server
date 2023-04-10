@@ -6,6 +6,7 @@ import {
   DbQueryService,
   QueryDetails,
 } from 'src/services/db-query/db-query.service';
+import { PushNotificationService } from 'src/services/push-notification/push-notification.service';
 import { S3Service } from 'src/services/s3/s3.service';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
@@ -22,10 +23,21 @@ export class GroupPostService {
     private groupService: GroupService,
     private s3Service: S3Service,
     private dbQueryService: DbQueryService,
+    private pushNotificationService: PushNotificationService,
   ) {}
   async create(createGroupPostDto: CreateGroupPostDto, authorEmail: string) {
     const author = await this.userService.findOneByEmail(authorEmail);
-    const group = await this.groupService.findOne(createGroupPostDto.groupId);
+    const group = await this.groupService.findOne(createGroupPostDto.groupId, [
+      'users',
+    ]);
+    if (group.users && group.users.length > 0) {
+      const userIds: string[] = [];
+      group.users.map((user) => userIds.push(user.id));
+      this.pushNotificationService.sendNotifications([...new Set(userIds)], {
+        title: 'New Group Post',
+        body: `There is a new post in group ${group.title}, from ${author.firstName}.`,
+      });
+    }
     const post = await this.groupPostRepository.save({
       author,
       group,
