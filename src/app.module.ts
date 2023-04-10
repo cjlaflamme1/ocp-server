@@ -17,6 +17,7 @@ import { GroupInvitationModule } from './group-invitation/group-invitation.modul
 import { DbQueryService } from './services/db-query/db-query.service';
 import { GroupPostModule } from './group-post/group-post.module';
 import { PushNotificationService } from './services/push-notification/push-notification.service';
+import { ResponseModule } from './response/response.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { PushNotificationService } from './services/push-notification/push-notif
     GroupModule,
     GroupInvitationModule,
     GroupPostModule,
+    ResponseModule,
   ],
   controllers: [AppController],
   providers: [AppService, S3Service, DbQueryService, PushNotificationService],
