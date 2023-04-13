@@ -48,7 +48,19 @@ export class UserService {
     const rawUserList = await this.userRepository.findAndCount({
       ...query,
       relations: returnRelationsObject(relations),
-      select: ['id', 'firstName', 'lastName', 'profilePhoto'],
+      // select: ['id', 'firstName', 'lastName', 'profilePhoto'],
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        profilePhoto: true,
+        groups: {
+          id: true,
+        },
+        adminForGroups: {
+          id: true,
+        },
+      },
     });
     if (rawUserList && rawUserList[1] > 0) {
       const formattedUser = await Promise.all(

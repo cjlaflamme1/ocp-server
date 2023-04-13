@@ -31,7 +31,10 @@ export class UserController {
   @Get()
   findAll(@Query() query, @Req() req) {
     const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
-    return this.userService.findAll(queryFormatted);
+    return this.userService.findAll(queryFormatted, [
+      'groups',
+      'adminForGroups',
+    ]);
   }
 
   @Get('/current')

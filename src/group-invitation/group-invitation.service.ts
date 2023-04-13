@@ -4,8 +4,12 @@ import { group } from 'console';
 import { GroupService } from 'src/group/group.service';
 import { returnRelationsObject } from 'src/helpers/relationArrayToObject';
 import { S3Service } from 'src/services/s3/s3.service';
+import { UserService } from 'src/user/user.service';
 import { IsNull, Repository } from 'typeorm';
-import { CreateGroupInvitationDto } from './dto/create-group-invitation.dto';
+import {
+  CreateGroupInvitationDto,
+  IncomingInviteExistingGroupDto,
+} from './dto/create-group-invitation.dto';
 import { UpdateGroupInvitationDto } from './dto/update-group-invitation.dto';
 import { GroupInvitation } from './entities/group-invitation.entity';
 
@@ -16,9 +20,26 @@ export class GroupInvitationService {
     private groupInvitationRepository: Repository<GroupInvitation>,
     private s3Service: S3Service,
     private groupService: GroupService,
+    private userService: UserService,
   ) {}
-  create(createGroupInvitationDto: CreateGroupInvitationDto) {
-    return 'This action adds a new groupInvitation';
+  async create(
+    createGroupInvitationDto: IncomingInviteExistingGroupDto,
+    invitedByEmail: string,
+  ) {
+    const group = await this.groupService.findOne(
+      createGroupInvitationDto.groupId,
+    );
+    const invites = await Promise.all(
+      createGroupInvitationDto.userIds.map(async (userId) => {
+        const invite = await this.groupInvitationRepository.save({
+          group,
+          invitedUser: await this.userService.findOneNoImage(userId),
+          invitedBy: await this.userService.findOneByEmail(invitedByEmail),
+        });
+        return invite;
+      }),
+    );
+    return invites;
   }
 
   async findAll(userEmail: string, relations: string[] = []) {

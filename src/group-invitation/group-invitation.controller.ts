@@ -10,7 +10,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { GroupInvitationService } from './group-invitation.service';
-import { CreateGroupInvitationDto } from './dto/create-group-invitation.dto';
+import { CreateGroupInvitationDto, IncomingInviteExistingGroupDto } from './dto/create-group-invitation.dto';
 import { UpdateGroupInvitationDto } from './dto/update-group-invitation.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
@@ -21,10 +21,16 @@ export class GroupInvitationController {
     private readonly groupInvitationService: GroupInvitationService,
   ) {}
 
-  // @Post()
-  // create(@Body() createGroupInvitationDto: CreateGroupInvitationDto) {
-  //   return this.groupInvitationService.create(createGroupInvitationDto);
-  // }
+  @Post()
+  create(
+    @Body() createGroupInvitationDto: IncomingInviteExistingGroupDto,
+    @Req() req,
+  ) {
+    return this.groupInvitationService.create(
+      createGroupInvitationDto,
+      req.user.email,
+    );
+  }
 
   @Get()
   findAll(@Req() req) {
