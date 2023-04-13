@@ -5,9 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GroupInvitation } from './entities/group-invitation.entity';
 import { S3Service } from 'src/services/s3/s3.service';
 import { GroupModule } from 'src/group/group.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([GroupInvitation]), GroupModule],
+  imports: [
+    TypeOrmModule.forFeature([GroupInvitation]),
+    GroupModule,
+    UserModule,
+  ],
   exports: [GroupInvitationService],
   controllers: [GroupInvitationController],
   providers: [GroupInvitationService, S3Service],
