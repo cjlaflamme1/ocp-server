@@ -51,6 +51,21 @@ export class GroupPostService {
     const groupPosts = await this.groupPostRepository.findAndCount({
       ...query,
       relations: returnRelationsObject(relations),
+      select: {
+        id: true,
+        image: true,
+        postText: true,
+        createdAt: true,
+        author: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePhoto: true,
+        },
+        responses: {
+          id: true,
+        },
+      },
     });
     if (groupPosts && groupPosts[1] > 0) {
       const formattedPosts = await Promise.all(

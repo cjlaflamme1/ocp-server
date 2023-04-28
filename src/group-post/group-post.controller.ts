@@ -30,7 +30,10 @@ export class GroupPostController {
   @Get()
   findAll(@Query() query) {
     const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
-    return this.groupPostService.findAll(queryFormatted, ['author']);
+    return this.groupPostService.findAll(queryFormatted, [
+      'author',
+      'responses',
+    ]);
   }
 
   @Get(':id')
