@@ -1,3 +1,4 @@
+import { GroupEvent } from 'src/group-event/entities/group-event.entity';
 import { GroupInvitation } from 'src/group-invitation/entities/group-invitation.entity';
 import { GroupPost } from 'src/group-post/entities/group-post.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -48,6 +49,9 @@ export class Group extends BaseEntity {
 
   @OneToMany(() => GroupPost, (groupPost) => groupPost.group)
   posts: GroupPost[];
+
+  @OneToMany(() => GroupEvent, (groupEvent) => groupEvent.group)
+  events: GroupEvent[];
 
   @CreateDateColumn()
   createdAt: Date;
