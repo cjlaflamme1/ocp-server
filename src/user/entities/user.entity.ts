@@ -1,3 +1,4 @@
+import { GroupEvent } from 'src/group-event/entities/group-event.entity';
 import { GroupInvitation } from 'src/group-invitation/entities/group-invitation.entity';
 import { GroupPost } from 'src/group-post/entities/group-post.entity';
 import { Group } from 'src/group/entities/group.entity';
@@ -62,6 +63,10 @@ export class User extends BaseEntity {
   @ManyToMany(() => Group, (group) => group.users)
   @JoinTable()
   groups: Group[];
+
+  @ManyToMany(() => GroupEvent, (groupEvent) => groupEvent.attendingUsers)
+  @JoinTable()
+  groupEvents: GroupEvent[];
 
   @OneToMany(
     () => GroupInvitation,

@@ -51,6 +51,21 @@ export class GroupPostService {
     const groupPosts = await this.groupPostRepository.findAndCount({
       ...query,
       relations: returnRelationsObject(relations),
+      select: {
+        id: true,
+        image: true,
+        postText: true,
+        createdAt: true,
+        author: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePhoto: true,
+        },
+        responses: {
+          id: true,
+        },
+      },
     });
     if (groupPosts && groupPosts[1] > 0) {
       const formattedPosts = await Promise.all(
@@ -82,7 +97,7 @@ export class GroupPostService {
   }
 
   async findOne(id: string, relations: object = {}) {
-    const post = await this.groupPostRepository.findOne({
+    const post: any = await this.groupPostRepository.findOne({
       where: {
         id,
       },
@@ -97,6 +112,19 @@ export class GroupPostService {
       if (post.author && post.author.profilePhoto) {
         authorImageUrl = await this.s3Service.getImageObjectSignedUrl(
           post.author.profilePhoto,
+        );
+      }
+      if (post.responses && post.responses.length) {
+        post.responses = await Promise.all(
+          post.responses.map(async (response) => {
+            let imageGetUrl = '';
+            if (response.author && response.author.profilePhoto) {
+              imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+                response.author.profilePhoto,
+              );
+            }
+            return { ...response, imageGetUrl };
+          }),
         );
       }
       return { ...post, imageGetUrl, authorImageUrl };
