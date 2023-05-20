@@ -159,6 +159,15 @@ export class GroupService {
     throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
   }
 
+  async findOneGroupEntity(id: string, relations: string[] = []) {
+    return this.groupRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: returnRelationsObject(relations),
+    });
+  }
+
   async addUserToGroup(userId: string, groupId: string) {
     const group = await this.groupRepository.findOne({
       where: {

@@ -21,6 +21,11 @@ export class GroupEvent {
   @Column()
   eventDate: Date;
 
+  @Column({
+    nullable: true,
+  })
+  coverPhoto: string;
+
   @Column()
   title: string;
 
