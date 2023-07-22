@@ -34,12 +34,19 @@ export class GroupEventController {
       'attendingUsers',
       'creator',
       'group',
+      'responses',
     ]);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.groupEventService.findOne(+id);
+    return this.groupEventService.findOne(id, {
+      creator: true,
+      attendingUsers: true,
+      responses: {
+        author: true,
+      },
+    });
   }
 
   @Patch(':id')
@@ -47,7 +54,7 @@ export class GroupEventController {
     @Param('id') id: string,
     @Body() updateGroupEventDto: UpdateGroupEventDto,
   ) {
-    return this.groupEventService.update(+id, updateGroupEventDto);
+    return this.groupEventService.update(id, updateGroupEventDto);
   }
 
   @Delete(':id')

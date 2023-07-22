@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { IncomingCreateResDto } from './dto/create-response.dto';
 import { UpdateResponseDto } from './dto/update-response.dto';
 import { Response } from './entities/response.entity';
+import { GroupEventService } from 'src/group-event/group-event.service';
 
 @Injectable()
 export class ResponseService {
@@ -16,39 +17,66 @@ export class ResponseService {
     private userService: UserService,
     private groupPostService: GroupPostService,
     private pushNotificationService: PushNotificationService,
+    private groupEventService: GroupEventService,
   ) {}
   async create(createResponseDto: IncomingCreateResDto, authorEmail: string) {
     const userIds: string[] = [];
     const author = await this.userService.findOneByEmail(authorEmail);
-    const groupPost = await this.groupPostService.findOne(
-      createResponseDto.groupPostId,
-      {
-        author: true,
-        responses: {
+    if (createResponseDto.groupPostId) {
+      const groupPost = await this.groupPostService.findOne(
+        createResponseDto.groupPostId,
+        {
           author: true,
+          responses: {
+            author: true,
+          },
+          group: true,
         },
-        group: true,
-      },
-    );
-    if (groupPost.author) {
-      userIds.push(groupPost.author.id);
-    }
-    if (groupPost.responses && groupPost.responses.length > 0) {
-      groupPost.responses.map((response) => {
-        if (response.author) {
-          userIds.push(response.author.id);
-        }
+      );
+      if (groupPost.author) {
+        userIds.push(groupPost.author.id);
+      }
+      if (groupPost.responses && groupPost.responses.length > 0) {
+        groupPost.responses.map((response) => {
+          if (response.author) {
+            userIds.push(response.author.id);
+          }
+        });
+      }
+      this.pushNotificationService.sendNotifications([...new Set(userIds)], {
+        title: `New Response`,
+        body: `There is a new response from ${author.firstName} in a thread you're involved in. Visit: ${groupPost.group.title} to view`,
+      });
+      return this.responseRepository.save({
+        responseText: createResponseDto.responseText,
+        author,
+        groupPost,
       });
     }
-    this.pushNotificationService.sendNotifications([...new Set(userIds)], {
-      title: `New Response`,
-      body: `There is a new response from ${author.firstName} in a thread you're involved in. Visit: ${groupPost.group.title} to view`,
-    });
-    return this.responseRepository.save({
-      responseText: createResponseDto.responseText,
-      author,
-      groupPost,
-    });
+    if (createResponseDto.groupEventId) {
+      const groupEvent = await this.groupEventService.findOne(
+        createResponseDto.groupEventId,
+        {
+          creator: true,
+          attendingUsers: true,
+        },
+      );
+      if (groupEvent.creator) {
+        userIds.push(groupEvent.creator.id);
+      }
+      if (groupEvent.attendingUsers && groupEvent.attendingUsers.length > 0) {
+        groupEvent.attendingUsers.map((user) => userIds.push(user.id));
+      }
+      this.pushNotificationService.sendNotifications([...new Set(userIds)], {
+        title: `New Event Response`,
+        body: `There is a new response from ${author.firstName} in an Event you're involved in. Visit: ${groupEvent.title} to view`,
+      });
+      return this.responseRepository.save({
+        responseText: createResponseDto.responseText,
+        author,
+        groupEvent,
+      });
+    }
   }
 
   // findAll() {

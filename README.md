@@ -3,7 +3,7 @@ Run:  docker compose up
 
 shutdown: docker compose down
 
-generate migrations: npx typeorm migration:generate ./migrations/addGroupEventImage -d /app/dist/ormconfig.js
+generate migrations: npx typeorm migration:generate ./migrations/addGroupEventResponses -d /app/dist/ormconfig.js
 
 create blank migration: npx typeorm migration:create ./migrations/addActivitySeed
 

@@ -1,4 +1,5 @@
 import { Group } from 'src/group/entities/group.entity';
+import { Response } from 'src/response/entities/response.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   BaseEntity,
@@ -42,6 +43,9 @@ export class GroupEvent {
 
   @ManyToMany(() => User, (user) => user.groupEvents)
   attendingUsers: User[];
+
+  @OneToMany(() => Response, (response) => response.groupEvent)
+  responses: Response[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from 'src/group/entities/group.entity';
 import { GroupService } from 'src/group/group.service';
@@ -11,7 +11,7 @@ import { PushNotificationService } from 'src/services/push-notification/push-not
 import { S3Service } from 'src/services/s3/s3.service';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, Repository } from 'typeorm';
 import {
   CreateGroupEventDto,
   IncomingCreateGroupEventDto,
@@ -114,11 +114,49 @@ export class GroupEventService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} groupEvent`;
+  async findOne(id: string, relations: FindOptionsRelations<GroupEvent> = {}) {
+    const currentEvent = await this.groupEventRepository.findOne({
+      where: {
+        id,
+      },
+      relations,
+    });
+    if (currentEvent) {
+      let imageGetUrl = '';
+      if (currentEvent.coverPhoto) {
+        imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+          currentEvent.coverPhoto,
+        );
+      }
+      return { ...currentEvent, imageGetUrl };
+    }
+    throw new HttpException('No Event Found', HttpStatus.NOT_FOUND);
   }
 
-  update(id: number, updateGroupEventDto: UpdateGroupEventDto) {
+  async update(id: string, updateGroupEventDto: UpdateGroupEventDto) {
+    if (updateGroupEventDto.attendingUserIds) {
+      const currentEvent = await this.groupEventRepository.findOne({
+        where: {
+          id,
+        },
+        relations: {
+          attendingUsers: true,
+        },
+      });
+      const newUsers = await Promise.all(
+        updateGroupEventDto.attendingUserIds.map(async (userid) => {
+          const user = await this.userService.findOneNoImage(userid);
+          return user;
+        }),
+      );
+      await this.groupEventRepository.save({
+        ...currentEvent,
+        attendingUsers: [
+          ...new Set([...(currentEvent.attendingUsers || []), ...newUsers]),
+        ],
+      });
+      return HttpStatus.CREATED;
+    }
     return `This action updates a #${id} groupEvent`;
   }
 
