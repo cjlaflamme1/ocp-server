@@ -1,3 +1,4 @@
+import { GroupEvent } from 'src/group-event/entities/group-event.entity';
 import { GroupPost } from 'src/group-post/entities/group-post.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -29,6 +30,9 @@ export class Response extends BaseEntity {
 
   @ManyToOne(() => GroupPost, (groupPost) => groupPost.responses)
   groupPost: GroupPost;
+
+  @ManyToOne(() => GroupEvent, (groupEvent) => groupEvent.responses)
+  groupEvent: GroupEvent;
 
   @CreateDateColumn()
   createdAt: Date;
