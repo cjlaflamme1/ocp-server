@@ -154,6 +154,40 @@ export class GroupService {
           group.coverPhoto,
         );
       }
+      const formattedUser = [];
+      if (group.users && group.users.length > 0) {
+        await Promise.all(
+          group.users.map(async (user) => {
+            if (user) {
+              let imageGetUrl = '';
+              if (user.profilePhoto) {
+                imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+                  user.profilePhoto,
+                );
+              }
+              formattedUser.push({ ...user, imageGetUrl });
+            }
+          }),
+        );
+      }
+      group.users = formattedUser;
+      const formattedAdmin = [];
+      if (group.groupAdmins && group.groupAdmins.length > 0) {
+        await Promise.all(
+          group.groupAdmins.map(async (user) => {
+            if (user) {
+              let imageGetUrl = '';
+              if (user.profilePhoto) {
+                imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+                  user.profilePhoto,
+                );
+              }
+              formattedAdmin.push({ ...user, imageGetUrl });
+            }
+          }),
+        );
+      }
+      group.groupAdmins = formattedAdmin;
       return { ...group, imageGetUrl };
     }
     throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
