@@ -100,12 +100,32 @@ export class UserService {
       where: {
         id: id,
       },
+      relations: {
+        activities: true,
+      },
     });
     if (user) {
       let imageGetUrl = '';
       if (user.profilePhoto) {
         imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
           user.profilePhoto,
+        );
+      }
+      if (user.activities && user.activities.length > 0) {
+        const repackageUserActivities = [];
+        await Promise.all(
+          user.activities.map(async (activity) => {
+            let getImageUrl = '';
+            if (activity.coverPhoto) {
+              getImageUrl = await this.s3Service.getImageObjectSignedUrl(
+                activity.coverPhoto,
+              );
+            }
+            repackageUserActivities.push({
+              ...activity,
+              getImageUrl,
+            });
+          }),
         );
       }
       return { ...user, imageGetUrl };
