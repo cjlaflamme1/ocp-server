@@ -77,6 +77,7 @@ export class GroupEventService {
         coverPhoto: true,
         title: true,
         createdAt: true,
+        eventDate: true,
         creator: {
           id: true,
           firstName: true,
@@ -99,6 +100,20 @@ export class GroupEventService {
             imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
               event.coverPhoto,
             );
+          }
+          let repackagedCreator = null;
+          if (event.creator) {
+            let imageGetUrl = '';
+            if (event.creator.profilePhoto) {
+              imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+                event.creator.profilePhoto,
+              );
+            }
+            repackagedCreator = {
+              ...event.creator,
+              imageGetUrl,
+            };
+            event.creator = repackagedCreator;
           }
           return { ...event, imageGetUrl };
         }),
@@ -128,6 +143,37 @@ export class GroupEventService {
           currentEvent.coverPhoto,
         );
       }
+      const formattedUser = [];
+      if (
+        currentEvent.attendingUsers &&
+        currentEvent.attendingUsers.length > 0
+      ) {
+        await Promise.all(
+          currentEvent.attendingUsers.map(async (user) => {
+            if (user) {
+              let imageGetUrl = '';
+              if (user.profilePhoto) {
+                imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+                  user.profilePhoto,
+                );
+              }
+              formattedUser.push({ ...user, imageGetUrl });
+            }
+          }),
+        );
+      }
+      let formattedCreator = null;
+      if (currentEvent.creator) {
+        let imageGetUrl = '';
+        if (currentEvent.creator.profilePhoto) {
+          imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+            currentEvent.creator.profilePhoto,
+          );
+        }
+        formattedCreator = { ...currentEvent.creator, imageGetUrl };
+      }
+      currentEvent.creator = formattedCreator;
+      currentEvent.attendingUsers = formattedUser;
       return { ...currentEvent, imageGetUrl };
     }
     throw new HttpException('No Event Found', HttpStatus.NOT_FOUND);
