@@ -127,6 +127,7 @@ export class UserService {
             });
           }),
         );
+        user.activities = repackageUserActivities;
       }
       return { ...user, imageGetUrl };
     }
