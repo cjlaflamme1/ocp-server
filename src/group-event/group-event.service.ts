@@ -172,6 +172,29 @@ export class GroupEventService {
         }
         formattedCreator = { ...currentEvent.creator, imageGetUrl };
       }
+      if (currentEvent.responses && currentEvent.responses.length > 0) {
+        const repackagedResponses = [];
+        await Promise.all(
+          currentEvent.responses.map(async (response) => {
+            let imageGetUrl = '';
+            if (response.author && response.author.profilePhoto) {
+              let repackedAuthor = null;
+              imageGetUrl = await this.s3Service.getImageObjectSignedUrl(
+                response.author.profilePhoto,
+              );
+              repackedAuthor = {
+                ...response.author,
+                imageGetUrl,
+              };
+              response.author = repackedAuthor;
+            }
+            repackagedResponses.push({
+              ...response,
+            });
+          }),
+        );
+        currentEvent.responses = repackagedResponses;
+      }
       currentEvent.creator = formattedCreator;
       currentEvent.attendingUsers = formattedUser;
       return { ...currentEvent, imageGetUrl };
