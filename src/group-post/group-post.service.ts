@@ -13,6 +13,7 @@ import { Repository } from 'typeorm';
 import { CreateGroupPostDto } from './dto/create-group-post.dto';
 import { UpdateGroupPostDto } from './dto/update-group-post.dto';
 import { GroupPost } from './entities/group-post.entity';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class GroupPostService {
@@ -24,6 +25,7 @@ export class GroupPostService {
     private s3Service: S3Service,
     private dbQueryService: DbQueryService,
     private pushNotificationService: PushNotificationService,
+    private notificationServices: NotificationsService,
   ) {}
   async create(createGroupPostDto: CreateGroupPostDto, authorEmail: string) {
     const author = await this.userService.findOneByEmail(authorEmail);
@@ -37,6 +39,16 @@ export class GroupPostService {
         title: 'New Group Post',
         body: `There is a new post in group ${group.title}, from ${author.firstName}.`,
       });
+      this.notificationServices.create(
+        group.users.map((user) => {
+          return {
+            title: 'New Group Post',
+            description: `There is a new post in group ${group.title}, from ${author.firstName}.`,
+            groupId: group.id,
+            user,
+          };
+        }),
+      );
     }
     const post = await this.groupPostRepository.save({
       author,

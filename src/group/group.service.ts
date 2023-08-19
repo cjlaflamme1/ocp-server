@@ -13,6 +13,7 @@ import { Not, Repository } from 'typeorm';
 import { CreateGroupDto, IncomingGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { Group } from './entities/group.entity';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class GroupService {
@@ -23,6 +24,7 @@ export class GroupService {
     private dbQueryService: DbQueryService,
     private s3Service: S3Service,
     private pushNotificationService: PushNotificationService,
+    private notificationsService: NotificationsService,
   ) {}
   logger = new Logger(GroupService.name);
 
@@ -58,6 +60,15 @@ export class GroupService {
           title: `You have been invited to: ${createGroupDto.title} `,
           body: `You have been invited to ${createGroupDto.title} by ${creator.firstName} ${creator.lastName}.  Open the app and navigate groups to accept or deny.`,
         },
+      );
+      this.notificationsService.createInviteNotifications(
+        {
+          title: 'Group Invitation',
+          description: `You have been invited to ${createGroupDto.title} by ${creator.firstName} ${creator.lastName}.`,
+          invite: true,
+          user: null,
+        },
+        createGroupDto.pendingInvitationUserIds,
       );
     }
     return this.groupRepository.save(newGroup);

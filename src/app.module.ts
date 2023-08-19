@@ -19,6 +19,7 @@ import { GroupPostModule } from './group-post/group-post.module';
 import { PushNotificationService } from './services/push-notification/push-notification.service';
 import { ResponseModule } from './response/response.module';
 import { GroupEventModule } from './group-event/group-event.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { GroupEventModule } from './group-event/group-event.module';
     GroupPostModule,
     ResponseModule,
     GroupEventModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService, S3Service, DbQueryService, PushNotificationService],

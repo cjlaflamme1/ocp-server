@@ -8,6 +8,7 @@ import { IncomingCreateResDto } from './dto/create-response.dto';
 import { UpdateResponseDto } from './dto/update-response.dto';
 import { Response } from './entities/response.entity';
 import { GroupEventService } from 'src/group-event/group-event.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class ResponseService {
@@ -17,6 +18,7 @@ export class ResponseService {
     private userService: UserService,
     private groupPostService: GroupPostService,
     private pushNotificationService: PushNotificationService,
+    private notificationsService: NotificationsService,
     private groupEventService: GroupEventService,
   ) {}
   async create(createResponseDto: IncomingCreateResDto, authorEmail: string) {
@@ -47,6 +49,15 @@ export class ResponseService {
         title: `New Response`,
         body: `There is a new response from ${author.firstName} in a thread you're involved in. Visit: ${groupPost.group.title} to view`,
       });
+      this.notificationsService.createInviteNotifications(
+        {
+          title: 'New Response',
+          description: `There is a new response from ${author.firstName} in a thread you're involved in.`,
+          postId: groupPost.id,
+          user: null,
+        },
+        userIds,
+      );
       return this.responseRepository.save({
         responseText: createResponseDto.responseText,
         author,
