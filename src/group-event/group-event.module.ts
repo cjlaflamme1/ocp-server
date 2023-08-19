@@ -8,9 +8,15 @@ import { GroupModule } from 'src/group/group.module';
 import { PushNotificationService } from 'src/services/push-notification/push-notification.service';
 import { DbQueryService } from 'src/services/db-query/db-query.service';
 import { S3Service } from 'src/services/s3/s3.service';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([GroupEvent]), UserModule, GroupModule],
+  imports: [
+    TypeOrmModule.forFeature([GroupEvent]),
+    UserModule,
+    GroupModule,
+    NotificationsModule,
+  ],
   exports: [GroupEventService],
   controllers: [GroupEventController],
   providers: [

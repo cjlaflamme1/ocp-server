@@ -18,6 +18,7 @@ import {
 } from './dto/create-group-event.dto';
 import { UpdateGroupEventDto } from './dto/update-group-event.dto';
 import { GroupEvent } from './entities/group-event.entity';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class GroupEventService {
@@ -26,7 +27,8 @@ export class GroupEventService {
     private groupEventRepository: Repository<GroupEvent>,
     private userService: UserService,
     private groupService: GroupService,
-    private notificationService: PushNotificationService,
+    private pushNotificationService: PushNotificationService,
+    private notificationsService: NotificationsService,
     private dbQueryService: DbQueryService,
     private s3Service: S3Service,
   ) {}
@@ -58,10 +60,19 @@ export class GroupEventService {
         userIds.push(...adminList);
       }
       if (userIds.length) {
-        this.notificationService.sendNotifications([...new Set(userIds)], {
+        this.pushNotificationService.sendNotifications([...new Set(userIds)], {
           title: `${group.title} has a new event!`,
           body: `${group.title} has a new event. ${createdEvent.title} has been added to the calendar by ${createdBy.firstName}. Log into the group to learn more and join!`,
         });
+        this.notificationsService.createInviteNotifications(
+          {
+            title: 'New Event',
+            description: `${group.title} has a new event. ${createdEvent.title} has been added to the calendar by ${createdBy.firstName}. Log into the group to learn more and join!`,
+            eventId: createdEvent.id,
+            user: null,
+          },
+          userIds,
+        );
       }
     }
     return createdEvent;

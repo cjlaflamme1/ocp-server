@@ -7,11 +7,13 @@ import { UserModule } from 'src/user/user.module';
 import { GroupPostModule } from 'src/group-post/group-post.module';
 import { PushNotificationService } from 'src/services/push-notification/push-notification.service';
 import { GroupEventModule } from 'src/group-event/group-event.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Response]),
     UserModule,
+    NotificationsModule,
     GroupPostModule,
     GroupEventModule,
   ],

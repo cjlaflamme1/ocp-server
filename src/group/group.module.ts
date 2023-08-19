@@ -7,9 +7,10 @@ import { UserModule } from 'src/user/user.module';
 import { DbQueryService } from 'src/services/db-query/db-query.service';
 import { S3Service } from 'src/services/s3/s3.service';
 import { PushNotificationService } from 'src/services/push-notification/push-notification.service';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Group]), UserModule],
+  imports: [TypeOrmModule.forFeature([Group]), UserModule, NotificationsModule],
   exports: [GroupService],
   controllers: [GroupController],
   providers: [GroupService, DbQueryService, S3Service, PushNotificationService],
