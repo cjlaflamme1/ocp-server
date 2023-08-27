@@ -79,20 +79,16 @@ export class GroupService {
     queryFormatted: QueryDetails,
     relations: string[] = [],
   ) {
+    const query = this.dbQueryService.queryBuilder(queryFormatted);
+    query['where'] = {
+      users: {
+        email: userEmail,
+      },
+      ...query['where'],
+    };
+    this.logger.log(JSON.stringify(query));
     const userGroups = await this.groupRepository.findAndCount({
-      where: [
-        {
-          groupAdmins: {
-            email: userEmail,
-          },
-        },
-        {
-          users: {
-            email: userEmail,
-          },
-        },
-      ],
-      ...queryFormatted,
+      ...query,
       relations: returnRelationsObject(relations),
     });
     if (userGroups && userGroups[1] > 0) {
