@@ -86,7 +86,6 @@ export class GroupService {
       },
       ...query['where'],
     };
-    this.logger.log(JSON.stringify(query));
     const userGroups = await this.groupRepository.findAndCount({
       ...query,
       relations: returnRelationsObject(relations),
