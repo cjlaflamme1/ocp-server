@@ -1,4 +1,13 @@
-import { Controller, Post, Req, UseGuards, Logger, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Req,
+  UseGuards,
+  Logger,
+  Param,
+  Body,
+  Get,
+} from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
@@ -27,5 +36,10 @@ export class AuthController {
     @Req() req,
   ) {
     return this.authService.login(req.user);
+  }
+
+  @Get('reset/:email')
+  requestReset(@Param('email') email: string, @Req() req) {
+    return this.authService.reqReset(email, req.headers['x-request-reset']);
   }
 }

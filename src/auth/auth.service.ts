@@ -14,6 +14,9 @@ const saltOrRounds = 10;
 
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { User } from 'src/user/entities/user.entity';
+import { ConfigService } from '@nestjs/config';
+import { ResetRequestService } from 'src/reset-request/reset-request.service';
+import { MailerService } from 'src/services/mailer/mailer.service';
 
 @Injectable()
 export class AuthService {
@@ -21,8 +24,13 @@ export class AuthService {
     private jwtService: JwtService,
     private userService: UserService,
     private refreshTokenService: RefreshTokenService,
+    private configService: ConfigService,
+    private resetRequestService: ResetRequestService,
+    private mailerService: MailerService,
   ) {}
   private readonly logger = new Logger(AuthService.name);
+  private readonly refreshAuth =
+    this.configService.get<string>('X-REQUEST-RESET');
 
   async signUp(user: CreateUserDto) {
     const userCheck = await this.userService.findOneByEmail(user.email);
@@ -125,5 +133,24 @@ export class AuthService {
       }
     }
     return null;
+  }
+
+  async reqReset(email: string, headerToken: string): Promise<any> {
+    if (headerToken && this.refreshAuth && headerToken === this.refreshAuth) {
+      const user = await this.userService.findOneByEmail(email);
+      // TODO add user reset stuff
+      if (user) {
+        const newToken = await this.resetRequestService.create(user);
+        if (newToken) {
+          await this.mailerService.resetPassword(
+            user.email,
+            newToken.resetToken,
+          );
+          return HttpStatus.OK;
+        }
+      }
+      return new HttpException('Failed', HttpStatus.EXPECTATION_FAILED);
+    }
+    return new UnauthorizedException('Invalid request');
   }
 }
