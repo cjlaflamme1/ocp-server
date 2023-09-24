@@ -17,6 +17,8 @@ import { User } from 'src/user/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { ResetRequestService } from 'src/reset-request/reset-request.service';
 import { MailerService } from 'src/services/mailer/mailer.service';
+import { ResetPasswordDTO } from './dto/reset.dto';
+import { LosenordService } from 'src/losenord/losenord.service';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +29,7 @@ export class AuthService {
     private configService: ConfigService,
     private resetRequestService: ResetRequestService,
     private mailerService: MailerService,
+    private losenordService: LosenordService,
   ) {}
   private readonly logger = new Logger(AuthService.name);
   private readonly refreshAuth =
@@ -146,7 +149,36 @@ export class AuthService {
             user.email,
             newToken.resetToken,
           );
-          return HttpStatus.OK;
+          return { email: user.email };
+        }
+      }
+      return new HttpException('Failed', HttpStatus.EXPECTATION_FAILED);
+    }
+    return new UnauthorizedException('Invalid request');
+  }
+
+  async submitReset(
+    resetDTO: ResetPasswordDTO,
+    headerToken: string,
+  ): Promise<any> {
+    if (headerToken && this.refreshAuth && headerToken === this.refreshAuth) {
+      const userResetTokens = await this.resetRequestService.findAll(
+        resetDTO.email,
+      );
+
+      if (userResetTokens && userResetTokens.length > 0) {
+        const currentToken = userResetTokens.find(
+          (t) => t.resetToken === resetDTO.token,
+        );
+        if (currentToken) {
+          // reset password
+          const user = await this.userService.findOneByEmail(resetDTO.email);
+          const hashedPw = await bcrypt.hash(resetDTO.password, saltOrRounds);
+          const newPw = await this.losenordService.createNew(hashedPw, user);
+          if (newPw) {
+            this.resetRequestService.deleteForUser(user.email);
+            return HttpStatus.OK;
+          }
         }
       }
       return new HttpException('Failed', HttpStatus.EXPECTATION_FAILED);

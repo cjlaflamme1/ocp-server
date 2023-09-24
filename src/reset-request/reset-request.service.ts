@@ -16,8 +16,8 @@ export class ResetRequestService {
   logger = new Logger(ResetRequestService.name);
 
   create(user: User) {
-    const minm = 10000;
-    const maxm = 99999;
+    const minm = 100000;
+    const maxm = 999999;
     const code = Math.floor(Math.random() * (maxm - minm + 1)) + minm;
     return this.resetRequestRepository.save({
       resetToken: code,
@@ -33,6 +33,11 @@ export class ResetRequestService {
         },
       },
     });
+  }
+
+  async deleteForUser(userEmail: string) {
+    const tokens = await this.findAll(userEmail);
+    return this.resetRequestRepository.remove(tokens);
   }
 
   @Cron('0 */1 * * * *', {

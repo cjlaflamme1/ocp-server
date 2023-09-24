@@ -10,12 +10,14 @@ import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { ResetRequestModule } from 'src/reset-request/reset-request.module';
 import { MailerService } from 'src/services/mailer/mailer.service';
+import { LosenordModule } from 'src/losenord/losenord.module';
 
 @Module({
   imports: [
     RefreshTokenModule,
     UserModule,
     PassportModule,
+    LosenordModule,
     ResetRequestModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

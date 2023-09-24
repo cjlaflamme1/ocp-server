@@ -11,6 +11,7 @@ import {
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
+import { ResetPasswordDTO } from './dto/reset.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -41,5 +42,13 @@ export class AuthController {
   @Get('reset/:email')
   requestReset(@Param('email') email: string, @Req() req) {
     return this.authService.reqReset(email, req.headers['x-request-reset']);
+  }
+
+  @Post('reset')
+  submitReset(@Body() resetDTO: ResetPasswordDTO, @Req() req) {
+    return this.authService.submitReset(
+      resetDTO,
+      req.headers['x-request-reset'],
+    );
   }
 }

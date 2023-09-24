@@ -19,8 +19,8 @@ export class MailerService {
       from: '"Red Beard Technologies" <noreply@redbeardtechnologies.com>',
       to: userEmail,
       subject: 'Outdoor Community Project: Reset',
-      text: token.toString(),
-      html: `<p>${token}</p>`,
+      text: token.toString() + ' This token expires in 15 minutes.',
+      html: `<p>${token}</p><p>This token expires in 15 minutes.</p>`,
     });
     return email;
   }
