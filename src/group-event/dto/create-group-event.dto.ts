@@ -15,6 +15,7 @@ export class CreateGroupEventDto {
   coverPhoto: string | null;
   title: string;
   description: string | null;
+  cancelled?: boolean;
   creator: User;
   group: Group;
   attendingUsers?: User[];

@@ -89,6 +89,7 @@ export class GroupEventService {
         coverPhoto: true,
         title: true,
         createdAt: true,
+        cancelled: true,
         eventDate: true,
         creator: {
           id: true,
@@ -223,6 +224,9 @@ export class GroupEventService {
         attendingUsers: true,
       },
     });
+    if (updateGroupEventDto.cancelled) {
+      this.notificationsService.alertEventCancelled(currentEvent);
+    }
     if (updateGroupEventDto.attendingUserIds) {
       const newUsers = await Promise.all(
         updateGroupEventDto.attendingUserIds.map(async (userid) => {
