@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from './entities/notification.entity';
 import { MoreThanOrEqual, Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
+import { GroupEvent } from 'src/group-event/entities/group-event.entity';
 
 @Injectable()
 export class NotificationsService {
@@ -35,6 +36,20 @@ export class NotificationsService {
         });
       }),
     );
+  }
+
+  alertEventCancelled(event: GroupEvent) {
+    if (event && event.attendingUsers && event.attendingUsers.length > 0) {
+      const notifications: CreateNotificationDto[] = event.attendingUsers.map(
+        (user) => ({
+          title: `${event.title} Cancelled`,
+          description: `${event.title} has been cancelled on ${new Date()}`,
+          eventId: event.id,
+          user,
+        }),
+      );
+      return this.notificationRepository.save(notifications);
+    }
   }
 
   async findAll(userEmail: string) {

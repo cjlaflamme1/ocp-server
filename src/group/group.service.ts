@@ -35,6 +35,7 @@ export class GroupService {
       title: createGroupDto.title,
       description: createGroupDto.description,
       groupAdmins: [creator],
+      users: [creator],
       pendingInvitations:
         createGroupDto.pendingInvitationUserIds &&
         createGroupDto.pendingInvitationUserIds.length > 0
@@ -250,6 +251,18 @@ export class GroupService {
         );
         const existingUsers = group.users ? group.users : [];
         existingUsers.push(...users);
+        return this.groupRepository.save({
+          id: group.id,
+          users: existingUsers,
+          ...updateGroupDto,
+        });
+      } else if (
+        updateGroupDto.removeUserIds &&
+        updateGroupDto.removeUserIds.length > 0
+      ) {
+        const existingUsers = group.users.filter(
+          (u) => !updateGroupDto.removeUserIds.includes(u.id),
+        );
         return this.groupRepository.save({
           id: group.id,
           users: existingUsers,

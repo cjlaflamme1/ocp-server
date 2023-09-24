@@ -12,7 +12,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { GroupService } from './group.service';
-import { CreateGroupDto, IncomingGroupDto } from './dto/create-group.dto';
+import { IncomingGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { QueryDetails } from 'src/services/db-query/db-query.service';

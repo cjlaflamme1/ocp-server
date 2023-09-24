@@ -44,6 +44,7 @@ export class GroupEventService {
       title: createGroupEventDto.title,
       description: createGroupEventDto.description,
       creator: createdBy,
+      attendingUsers: [createdBy],
       group,
       coverPhoto: createGroupEventDto.coverPhoto,
       eventDate: createGroupEventDto.eventDate,
@@ -88,6 +89,7 @@ export class GroupEventService {
         coverPhoto: true,
         title: true,
         createdAt: true,
+        cancelled: true,
         eventDate: true,
         creator: {
           id: true,
@@ -214,30 +216,48 @@ export class GroupEventService {
   }
 
   async update(id: string, updateGroupEventDto: UpdateGroupEventDto) {
+    const currentEvent = await this.groupEventRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        attendingUsers: true,
+      },
+    });
+    if (updateGroupEventDto.cancelled) {
+      this.notificationsService.alertEventCancelled(currentEvent);
+    }
     if (updateGroupEventDto.attendingUserIds) {
-      const currentEvent = await this.groupEventRepository.findOne({
-        where: {
-          id,
-        },
-        relations: {
-          attendingUsers: true,
-        },
-      });
       const newUsers = await Promise.all(
         updateGroupEventDto.attendingUserIds.map(async (userid) => {
           const user = await this.userService.findOneNoImage(userid);
           return user;
         }),
       );
-      await this.groupEventRepository.save({
+      return this.groupEventRepository.save({
         ...currentEvent,
         attendingUsers: [
           ...new Set([...(currentEvent.attendingUsers || []), ...newUsers]),
         ],
+        ...updateGroupEventDto,
       });
-      return HttpStatus.CREATED;
+    } else if (
+      updateGroupEventDto.removeUserIds &&
+      updateGroupEventDto.removeUserIds.length > 0
+    ) {
+      const filteredUsers = currentEvent.attendingUsers.filter(
+        (u) => !updateGroupEventDto.removeUserIds.includes(u.id),
+      );
+      return this.groupEventRepository.save({
+        ...currentEvent,
+        attendingUsers: filteredUsers,
+        ...updateGroupEventDto,
+      });
     }
-    return `This action updates a #${id} groupEvent`;
+    return this.groupEventRepository.save({
+      ...currentEvent,
+      ...updateGroupEventDto,
+    });
   }
 
   remove(id: number) {

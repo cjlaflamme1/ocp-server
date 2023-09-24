@@ -36,6 +36,11 @@ export class GroupEvent {
   })
   description: string;
 
+  @Column({
+    default: false,
+  })
+  cancelled: boolean;
+
   @ManyToOne(() => User)
   creator: User;
 
