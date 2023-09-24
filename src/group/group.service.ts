@@ -255,6 +255,18 @@ export class GroupService {
           users: existingUsers,
           ...updateGroupDto,
         });
+      } else if (
+        updateGroupDto.removeUserIds &&
+        updateGroupDto.removeUserIds.length > 0
+      ) {
+        const existingUsers = group.users.filter(
+          (u) => !updateGroupDto.removeUserIds.includes(u.id),
+        );
+        return this.groupRepository.save({
+          id: group.id,
+          users: existingUsers,
+          ...updateGroupDto,
+        });
       } else {
         return this.groupRepository.save({
           id: group.id,
