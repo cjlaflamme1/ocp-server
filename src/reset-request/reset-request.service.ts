@@ -52,7 +52,6 @@ export class ResetRequestService {
         createdAt: LessThanOrEqual(fifteenMinutesAgo),
       },
     });
-    this.logger.log(JSON.stringify(toDelete));
     await this.resetRequestRepository.remove(toDelete);
   }
 }
