@@ -3,4 +3,5 @@ import { CreateGroupEventDto } from './create-group-event.dto';
 
 export class UpdateGroupEventDto extends PartialType(CreateGroupEventDto) {
   attendingUserIds?: string[];
+  removeUserIds?: string[];
 }

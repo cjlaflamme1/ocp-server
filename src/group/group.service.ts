@@ -35,6 +35,7 @@ export class GroupService {
       title: createGroupDto.title,
       description: createGroupDto.description,
       groupAdmins: [creator],
+      users: [creator],
       pendingInvitations:
         createGroupDto.pendingInvitationUserIds &&
         createGroupDto.pendingInvitationUserIds.length > 0
