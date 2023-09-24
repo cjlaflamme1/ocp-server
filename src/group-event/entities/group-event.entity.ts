@@ -32,6 +32,7 @@ export class GroupEvent {
 
   @Column({
     nullable: true,
+    type: 'longtext',
   })
   description: string;
 

@@ -18,13 +18,13 @@ export class UsersActivity extends BaseEntity {
 
   @Column({
     nullable: true,
-    type: 'mediumtext',
+    type: 'longtext',
   })
   information: string;
 
   @Column({
     nullable: true,
-    type: 'mediumtext',
+    type: 'longtext',
   })
   favoriteLocations: string;
 
@@ -35,7 +35,7 @@ export class UsersActivity extends BaseEntity {
 
   @Column({
     nullable: true,
-    type: 'mediumtext',
+    type: 'longtext',
   })
   preferredGroupDetails: string;
 
@@ -46,7 +46,7 @@ export class UsersActivity extends BaseEntity {
 
   @Column({
     nullable: true,
-    type: 'mediumtext',
+    type: 'longtext',
   })
   mentorNeedsDetails: string;
 
@@ -57,7 +57,7 @@ export class UsersActivity extends BaseEntity {
 
   @Column({
     nullable: true,
-    type: 'mediumtext',
+    type: 'longtext',
   })
   provideMentorshipDetails: string;
 

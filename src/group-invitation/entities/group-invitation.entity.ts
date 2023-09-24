@@ -26,6 +26,7 @@ export class GroupInvitation extends BaseEntity {
 
   @Column({
     nullable: true,
+    type: 'longtext',
   })
   message: string;
 
