@@ -11,6 +11,13 @@ export class LosenordService {
     private losenordRepository: Repository<Losenord>,
   ) {}
 
+  async createNew(losenord: string, user: User) {
+    return this.losenordRepository.save({
+      losenord,
+      user,
+    });
+  }
+
   async findByUser(user: User) {
     const losenord: Losenord[] = await this.losenordRepository.find({
       where: {

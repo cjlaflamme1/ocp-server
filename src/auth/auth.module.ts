@@ -8,12 +8,17 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
+import { ResetRequestModule } from 'src/reset-request/reset-request.module';
+import { MailerService } from 'src/services/mailer/mailer.service';
+import { LosenordModule } from 'src/losenord/losenord.module';
 
 @Module({
   imports: [
     RefreshTokenModule,
     UserModule,
     PassportModule,
+    LosenordModule,
+    ResetRequestModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -23,7 +28,7 @@ import { JwtStrategy } from './jwt.strategy';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, MailerService],
   controllers: [AuthController],
   exports: [AuthService, JwtModule],
 })

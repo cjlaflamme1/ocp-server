@@ -20,6 +20,8 @@ import { PushNotificationService } from './services/push-notification/push-notif
 import { ResponseModule } from './response/response.module';
 import { GroupEventModule } from './group-event/group-event.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MailerService } from './services/mailer/mailer.service';
+import { ResetRequestModule } from './reset-request/reset-request.module';
 
 @Module({
   imports: [
@@ -49,8 +51,9 @@ import { NotificationsModule } from './notifications/notifications.module';
     ResponseModule,
     GroupEventModule,
     NotificationsModule,
+    ResetRequestModule,
   ],
   controllers: [AppController],
-  providers: [AppService, S3Service, DbQueryService, PushNotificationService],
+  providers: [AppService, S3Service, DbQueryService, PushNotificationService, MailerService],
 })
 export class AppModule {}

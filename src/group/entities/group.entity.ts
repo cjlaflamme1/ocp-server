@@ -28,7 +28,7 @@ export class Group extends BaseEntity {
   title: string;
 
   @Column({
-    type: 'mediumtext',
+    type: 'longtext',
   })
   description: string;
 
