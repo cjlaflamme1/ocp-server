@@ -210,4 +210,13 @@ export class UserService {
     });
     return user;
   }
+
+  dbTest(): Promise<User[]> {
+    return this.userRepository.find({
+      select: {
+        createdAt: true,
+      },
+      take: 1,
+    });
+  }
 }
