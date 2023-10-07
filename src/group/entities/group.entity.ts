@@ -28,6 +28,11 @@ export class Group extends BaseEntity {
   title: string;
 
   @Column({
+    nullable: true,
+  })
+  location: string;
+
+  @Column({
     type: 'longtext',
   })
   description: string;

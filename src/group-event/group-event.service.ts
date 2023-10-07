@@ -56,10 +56,6 @@ export class GroupEventService {
         const userList = group.users.map((user) => user.id);
         userIds.push(...userList);
       }
-      if (group.groupAdmins && group.groupAdmins.length) {
-        const adminList = group.groupAdmins.map((user) => user.id);
-        userIds.push(...adminList);
-      }
       if (userIds.length) {
         this.pushNotificationService.sendNotifications([...new Set(userIds)], {
           title: `${group.title} has a new event!`,
