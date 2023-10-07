@@ -9,7 +9,7 @@ import {
 import { PushNotificationService } from 'src/services/push-notification/push-notification.service';
 import { S3Service } from 'src/services/s3/s3.service';
 import { UserService } from 'src/user/user.service';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateGroupDto, IncomingGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { Group } from './entities/group.entity';
@@ -34,6 +34,7 @@ export class GroupService {
       coverPhoto: createGroupDto.coverPhoto,
       title: createGroupDto.title,
       description: createGroupDto.description,
+      location: createGroupDto.location,
       groupAdmins: [creator],
       users: [creator],
       pendingInvitations:
