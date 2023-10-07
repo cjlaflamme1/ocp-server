@@ -34,6 +34,7 @@ export class GroupService {
       coverPhoto: createGroupDto.coverPhoto,
       title: createGroupDto.title,
       description: createGroupDto.description,
+      location: createGroupDto.location,
       groupAdmins: [creator],
       users: [creator],
       pendingInvitations:
