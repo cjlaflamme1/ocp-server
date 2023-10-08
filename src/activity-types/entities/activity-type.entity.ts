@@ -20,9 +20,6 @@ export class ActivityType extends BaseEntity {
   })
   activityTitle: string;
 
-  @OneToMany(() => UsersActivity, (usersActivity) => usersActivity.activityType)
-  usersActivity: UsersActivity[];
-
   @CreateDateColumn()
   createdAt: Date;
 
