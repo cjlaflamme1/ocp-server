@@ -23,10 +23,10 @@ export class ActivityTypesController {
   //   return this.activityTypesService.create(createActivityTypeDto);
   // }
 
-  @Get()
-  findAll() {
-    return this.activityTypesService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.activityTypesService.findAll();
+  // }
 
   // @Get(':id')
   // findOne(@Param('id') id: string) {

@@ -25,9 +25,6 @@ export class UsersActivityService {
     const user = await this.userService.findOneByEmail(userEmail);
     return this.usersActivityRepository.save({
       ...createUsersActivityDto,
-      activityType: await this.activityTypesService.findOne(
-        createUsersActivityDto.activityTypeId,
-      ),
       user,
     });
   }

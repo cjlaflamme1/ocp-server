@@ -18,6 +18,11 @@ export class UsersActivity extends BaseEntity {
 
   @Column({
     nullable: true,
+  })
+  activityName: string;
+
+  @Column({
+    nullable: true,
     type: 'longtext',
   })
   information: string;
@@ -65,11 +70,6 @@ export class UsersActivity extends BaseEntity {
     nullable: true,
   })
   coverPhoto: string;
-
-  @ManyToOne(() => ActivityType, (activityType) => activityType.usersActivity, {
-    eager: true,
-  })
-  activityType: ActivityType;
 
   @ManyToOne(() => User, (user) => user.activities)
   user: User;

@@ -1,7 +1,7 @@
-import { ActivityType } from 'src/activity-types/entities/activity-type.entity';
 import { User } from 'src/user/entities/user.entity';
 
 export class CreateUsersActivityDto {
+  activityName: string;
   information: string;
   favoriteLocations: string;
   yearsParticipating: string;
@@ -13,5 +13,4 @@ export class CreateUsersActivityDto {
   activityTypeId: string;
   coverPhoto: string;
   user: User;
-  activityType: ActivityType;
 }
