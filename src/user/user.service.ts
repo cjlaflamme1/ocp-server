@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { returnRelationsObject } from 'src/helpers/relationArrayToObject';
 import { Losenord } from 'src/losenord/entities/losenord.entity';
-import { LosenordService } from 'src/losenord/losenord.service';
 import {
   DbQueryService,
   QueryDetails,
@@ -12,15 +11,16 @@ import { In, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { MailerService } from 'src/services/mailer/mailer.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    private losenordService: LosenordService,
     private s3Service: S3Service,
     private dbQueryService: DbQueryService,
+    private mailerService: MailerService,
   ) {}
   logger = new Logger(UserService.name);
   create(createUserDto: CreateUserDto) {
@@ -163,8 +163,15 @@ export class UserService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string, userEmail: string) {
+    const user = await this.findOneNoImage(id);
+    if (user && user.email === userEmail) {
+      return this.mailerService.requestDeletion(user);
+    }
+    throw new HttpException(
+      'Not permitted to delete another account',
+      HttpStatus.BAD_REQUEST,
+    );
   }
 
   findOneByEmail(email: string, relations: string[] = []) {
