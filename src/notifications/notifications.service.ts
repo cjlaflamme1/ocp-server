@@ -58,17 +58,21 @@ export class NotificationsService {
     const threeDaysAgo = new Date(
       currentDate.setDate(currentDate.getDate() - 3),
     );
-    return this.notificationRepository.find({
-      relations: {
-        user: true,
-      },
-      where: {
-        user: {
-          id: currentUser.id,
+    if (currentUser) {
+      const notices = await this.notificationRepository.find({
+        relations: {
+          user: true,
         },
-        createdAt: MoreThanOrEqual(threeDaysAgo),
-      },
-    });
+        where: {
+          user: {
+            id: currentUser.id,
+          },
+          createdAt: MoreThanOrEqual(threeDaysAgo),
+        },
+      });
+      return notices;
+    }
+    return null;
   }
 
   // findOne(id: number) {
