@@ -52,6 +52,7 @@ export class GroupEventController {
   }
 
   @Patch(':id')
+  @UseGuards(TestUserGuard)
   update(
     @Param('id') id: string,
     @Body() updateGroupEventDto: UpdateGroupEventDto,
