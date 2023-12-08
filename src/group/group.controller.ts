@@ -16,6 +16,7 @@ import { IncomingGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { QueryDetails } from 'src/services/db-query/db-query.service';
+import { TestUserGuard } from 'src/auth/test-user.guard';
 
 @Controller('group')
 @UseGuards(JwtAuthGuard)
@@ -23,6 +24,7 @@ export class GroupController {
   constructor(private readonly groupService: GroupService) {}
   logger = new Logger(GroupController.name);
   @Post()
+  @UseGuards(TestUserGuard)
   create(@Body() createGroupDto: IncomingGroupDto, @Req() req) {
     return this.groupService.create(createGroupDto, req.user.email);
   }

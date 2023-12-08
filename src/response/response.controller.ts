@@ -13,6 +13,7 @@ import { ResponseService } from './response.service';
 import { IncomingCreateResDto } from './dto/create-response.dto';
 import { UpdateResponseDto } from './dto/update-response.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { TestUserGuard } from 'src/auth/test-user.guard';
 
 @Controller('response')
 @UseGuards(JwtAuthGuard)
@@ -20,6 +21,7 @@ export class ResponseController {
   constructor(private readonly responseService: ResponseService) {}
 
   @Post()
+  @UseGuards(TestUserGuard)
   create(@Body() createResponseDto: IncomingCreateResDto, @Req() req) {
     return this.responseService.create(createResponseDto, req.user.email);
   }

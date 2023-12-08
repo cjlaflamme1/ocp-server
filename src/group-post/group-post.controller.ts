@@ -16,6 +16,7 @@ import { CreateGroupPostDto } from './dto/create-group-post.dto';
 import { UpdateGroupPostDto } from './dto/update-group-post.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { QueryDetails } from 'src/services/db-query/db-query.service';
+import { TestUserGuard } from 'src/auth/test-user.guard';
 
 @Controller('group-post')
 @UseGuards(JwtAuthGuard)
@@ -23,6 +24,7 @@ export class GroupPostController {
   constructor(private readonly groupPostService: GroupPostService) {}
   logger = new Logger(GroupPostController.name);
   @Post()
+  @UseGuards(TestUserGuard)
   create(@Body() createGroupPostDto: CreateGroupPostDto, @Req() req) {
     return this.groupPostService.create(createGroupPostDto, req.user.email);
   }

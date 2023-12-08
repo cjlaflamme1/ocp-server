@@ -15,6 +15,7 @@ import { IncomingCreateGroupEventDto } from './dto/create-group-event.dto';
 import { UpdateGroupEventDto } from './dto/update-group-event.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { QueryDetails } from 'src/services/db-query/db-query.service';
+import { TestUserGuard } from 'src/auth/test-user.guard';
 
 @Controller('group-event')
 @UseGuards(JwtAuthGuard)
@@ -22,6 +23,7 @@ export class GroupEventController {
   constructor(private readonly groupEventService: GroupEventService) {}
 
   @Post()
+  @UseGuards(TestUserGuard)
   create(@Body() createGroupEventDto: IncomingCreateGroupEventDto, @Req() req) {
     createGroupEventDto.creatorEmail = req.user.email;
     return this.groupEventService.create(createGroupEventDto);
