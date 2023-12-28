@@ -9,6 +9,7 @@ import { UpdateResponseDto } from './dto/update-response.dto';
 import { Response } from './entities/response.entity';
 import { GroupEventService } from 'src/group-event/group-event.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
+import filterAndUniqueIdArray from 'src/helpers/filterAndUniqueArray';
 
 @Injectable()
 export class ResponseService {
@@ -45,7 +46,8 @@ export class ResponseService {
           }
         });
       }
-      this.pushNotificationService.sendNotifications([...new Set(userIds)], {
+      const filteredIds = filterAndUniqueIdArray(userIds, [author.id]);
+      this.pushNotificationService.sendNotifications(filteredIds, {
         title: `New Response`,
         body: `There is a new response from ${author.firstName} in a thread you're involved in. Visit: ${groupPost.group.title} to view`,
       });
@@ -56,7 +58,7 @@ export class ResponseService {
           postId: groupPost.id,
           user: null,
         },
-        userIds,
+        filteredIds,
       );
       return this.responseRepository.save({
         responseText: createResponseDto.responseText,
@@ -78,7 +80,8 @@ export class ResponseService {
       if (groupEvent.attendingUsers && groupEvent.attendingUsers.length > 0) {
         groupEvent.attendingUsers.map((user) => userIds.push(user.id));
       }
-      this.pushNotificationService.sendNotifications([...new Set(userIds)], {
+      const filteredIds = filterAndUniqueIdArray(userIds, [author.id]);
+      this.pushNotificationService.sendNotifications(filteredIds, {
         title: `New Event Response`,
         body: `There is a new response from ${author.firstName} in an Event you're involved in. Visit: ${groupEvent.title} to view`,
       });

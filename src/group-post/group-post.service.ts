@@ -14,6 +14,7 @@ import { CreateGroupPostDto } from './dto/create-group-post.dto';
 import { UpdateGroupPostDto } from './dto/update-group-post.dto';
 import { GroupPost } from './entities/group-post.entity';
 import { NotificationsService } from 'src/notifications/notifications.service';
+import filterAndUniqueIdArray from 'src/helpers/filterAndUniqueArray';
 
 @Injectable()
 export class GroupPostService {
@@ -35,19 +36,22 @@ export class GroupPostService {
     if (group.users && group.users.length > 0) {
       const userIds: string[] = [];
       group.users.map((user) => userIds.push(user.id));
-      this.pushNotificationService.sendNotifications([...new Set(userIds)], {
+      const filteredIds = filterAndUniqueIdArray(userIds, [author.id]);
+      this.pushNotificationService.sendNotifications(filteredIds, {
         title: 'New Group Post',
         body: `There is a new post in group ${group.title}, from ${author.firstName}.`,
       });
       this.notificationServices.create(
-        group.users.map((user) => {
-          return {
-            title: 'New Group Post',
-            description: `There is a new post in group ${group.title}, from ${author.firstName}.`,
-            groupId: group.id,
-            user,
-          };
-        }),
+        group.users
+          ?.filter((u) => filteredIds.includes(u.id))
+          .map((user) => {
+            return {
+              title: 'New Group Post',
+              description: `There is a new post in group ${group.title}, from ${author.firstName}.`,
+              groupId: group.id,
+              user,
+            };
+          }),
       );
     }
     const post = await this.groupPostRepository.save({
