@@ -19,6 +19,7 @@ import {
 import { UpdateGroupEventDto } from './dto/update-group-event.dto';
 import { GroupEvent } from './entities/group-event.entity';
 import { NotificationsService } from 'src/notifications/notifications.service';
+import filterAndUniqueIdArray from 'src/helpers/filterAndUniqueArray';
 
 @Injectable()
 export class GroupEventService {
@@ -57,7 +58,8 @@ export class GroupEventService {
         userIds.push(...userList);
       }
       if (userIds.length) {
-        this.pushNotificationService.sendNotifications([...new Set(userIds)], {
+        const filteredIds = filterAndUniqueIdArray(userIds, [createdBy.id]);
+        this.pushNotificationService.sendNotifications(filteredIds, {
           title: `${group.title} has a new event!`,
           body: `${group.title} has a new event. ${createdEvent.title} has been added to the calendar by ${createdBy.firstName}. Log into the group to learn more and join!`,
         });
@@ -68,7 +70,7 @@ export class GroupEventService {
             eventId: createdEvent.id,
             user: null,
           },
-          userIds,
+          filteredIds,
         );
       }
     }
