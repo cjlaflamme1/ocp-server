@@ -31,17 +31,33 @@ export class GroupController {
 
   @Get()
   findAll(@Query() query) {
-    const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
-    return this.groupService.findAll(queryFormatted, ['users']);
+    this.logger.log(query);
+    try {
+      const decodedDataSource = decodeURI(query.dataSource);
+      const queryFormatted: QueryDetails = JSON.parse(decodedDataSource);
+      this.logger.log(queryFormatted);
+      return this.groupService.findAll(queryFormatted, ['users']);
+    } catch (error) {
+      this.logger.error('Error parsing dataSource:', error);
+      throw error;
+    }
   }
 
   @Get('/current')
   findCurrent(@Query() query, @Req() req) {
-    const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
-    return this.groupService.findUserGroups(req.user.email, queryFormatted, [
-      'users',
-      'groupAdmins',
-    ]);
+    this.logger.log(query);
+    try {
+      const decodedDataSource = decodeURI(query.dataSource);
+      const queryFormatted: QueryDetails = JSON.parse(decodedDataSource);
+      this.logger.log(queryFormatted);
+      return this.groupService.findUserGroups(req.user.email, queryFormatted, [
+        'users',
+        'groupAdmins',
+      ]);
+    } catch (error) {
+      this.logger.error('Error parsing dataSource:', error);
+      throw error;
+    }
   }
 
   @Get(':id')

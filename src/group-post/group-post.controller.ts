@@ -23,6 +23,7 @@ import { TestUserGuard } from 'src/auth/test-user.guard';
 export class GroupPostController {
   constructor(private readonly groupPostService: GroupPostService) {}
   logger = new Logger(GroupPostController.name);
+
   @Post()
   @UseGuards(TestUserGuard)
   create(@Body() createGroupPostDto: CreateGroupPostDto, @Req() req) {
@@ -32,11 +33,18 @@ export class GroupPostController {
   @Get()
   findAll(@Query() query) {
     this.logger.log(query);
-    const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
-    return this.groupPostService.findAll(queryFormatted, [
-      'author',
-      'responses',
-    ]);
+    try {
+      const decodedDataSource = decodeURI(query.dataSource);
+      const queryFormatted: QueryDetails = JSON.parse(decodedDataSource);
+      this.logger.log(queryFormatted);
+      return this.groupPostService.findAll(queryFormatted, [
+        'author',
+        'responses',
+      ]);
+    } catch (error) {
+      this.logger.error('Error parsing dataSource:', error);
+      throw error;
+    }
   }
 
   @Get(':id')

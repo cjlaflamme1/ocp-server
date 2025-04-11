@@ -16,10 +16,13 @@ import { UpdateGroupEventDto } from './dto/update-group-event.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { QueryDetails } from 'src/services/db-query/db-query.service';
 import { TestUserGuard } from 'src/auth/test-user.guard';
+import { Logger } from '@nestjs/common';
 
 @Controller('group-event')
 @UseGuards(JwtAuthGuard)
 export class GroupEventController {
+  private readonly logger = new Logger(GroupEventController.name);
+
   constructor(private readonly groupEventService: GroupEventService) {}
 
   @Post()
@@ -31,13 +34,21 @@ export class GroupEventController {
 
   @Get()
   findAll(@Query() query) {
-    const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
-    return this.groupEventService.findAll(queryFormatted, [
-      'attendingUsers',
-      'creator',
-      'group',
-      'responses',
-    ]);
+    this.logger.log(query);
+    try {
+      const decodedDataSource = decodeURI(query.dataSource);
+      const queryFormatted: QueryDetails = JSON.parse(decodedDataSource);
+      this.logger.log(queryFormatted);
+      return this.groupEventService.findAll(queryFormatted, [
+        'attendingUsers',
+        'creator',
+        'group',
+        'responses',
+      ]);
+    } catch (error) {
+      this.logger.error('Error parsing dataSource:', error);
+      throw error;
+    }
   }
 
   @Get(':id')

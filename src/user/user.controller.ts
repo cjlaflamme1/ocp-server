@@ -29,12 +29,20 @@ export class UserController {
   }
 
   @Get()
-  findAll(@Query() query, @Req() req) {
-    const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
-    return this.userService.findAll(queryFormatted, [
-      'groups',
-      'adminForGroups',
-    ]);
+  findAll(@Query() query) {
+    this.logger.log(query);
+    try {
+      const decodedDataSource = decodeURI(query.dataSource);
+      const queryFormatted: QueryDetails = JSON.parse(decodedDataSource);
+      this.logger.log(queryFormatted);
+      return this.userService.findAll(queryFormatted, [
+        'groups',
+        'adminForGroups',
+      ]);
+    } catch (error) {
+      this.logger.error('Error parsing dataSource:', error);
+      throw error;
+    }
   }
 
   @Get('/current')
