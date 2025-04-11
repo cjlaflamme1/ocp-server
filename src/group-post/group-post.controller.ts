@@ -31,8 +31,8 @@ export class GroupPostController {
 
   @Get()
   findAll(@Query() query) {
+    this.logger.log(query);
     const queryFormatted: QueryDetails = JSON.parse(query.dataSource);
-    this.logger.log(queryFormatted);
     return this.groupPostService.findAll(queryFormatted, [
       'author',
       'responses',
