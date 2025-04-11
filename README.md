@@ -1,85 +1,126 @@
+# Outdoor Community Project - Server
 
-Run:  docker compose up
+[![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 
-shutdown: docker compose down
+## Overview
 
-generate migrations: npx typeorm migration:generate ./migrations/addGroupLocation -d /app/dist/ormconfig.js
+This is the backend server for the **Outdoor Community Project**, a platform designed to connect outdoor enthusiasts and facilitate group activities. The server provides a RESTful API built with NestJS and TypeScript, supporting features like user management, group creation, event organization, and social interactions.
 
-create blank migration: npx typeorm migration:create ./migrations/addActivitySeed
+> **Note**: This project is no longer actively maintained and is preserved for demo purposes only.
 
-run migrations:npx typeorm migration:run -d /app/dist/ormconfig.js
-run migrations prod:npx typeorm migration:run -d ./dist/ormconfig.js
+## Mobile App
 
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+The corresponding mobile application can be found at:
+[Outdoor Community Project Mobile App](https://github.com/cjlaflamme1/ocpMobile)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Features
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- User authentication and authorization
+- Group management and membership
+- Event creation and RSVP system
+- Activity tracking and sharing
+- Push notifications
+- File storage with AWS S3
+- Real-time updates
 
-## Description
+## Technical Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Framework**: NestJS
+- **Language**: TypeScript
+- **Database**: MySQL
+- **ORM**: TypeORM
+- **Authentication**: JWT
+- **File Storage**: AWS S3
+- **Push Notifications**: Expo Server SDK
 
-## Installation
+## Getting Started
 
+### Prerequisites
+
+- Node.js (v22 or higher)
+- MySQL (v8.0 or higher)
+- AWS S3 bucket (for file storage)
+- Expo account (for push notifications)
+- Docker and Docker Compose (for containerized deployment)
+
+### Installation
+
+1. Clone the repository.
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env` file with the following variables:
+   ```env
+   DB_HOST=localhost
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   DB_NAME=ocp_database
+   JWT_SECRET=your_jwt_secret
+   AWS_ACCESS_KEY_ID=your_aws_access_key
+   AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+   AWS_BUCKET_NAME=your_bucket_name
+   ```
+
+### Running with Docker
+
+1. Start the application:
+   ```bash
+   docker compose up
+   ```
+
+2. Stop the application:
+   ```bash
+   docker compose down
+   ```
+
+### Database Migrations
+
+1. Generate a new migration:
+   ```bash
+   npx typeorm migration:generate ./migrations/[migration-name] -d /app/dist/ormconfig.js
+   ```
+
+2. Create a blank migration:
+   ```bash
+   npx typeorm migration:create ./migrations/[migration-name]
+   ```
+
+3. Run migrations in development:
+   ```bash
+   npx typeorm migration:run -d /app/dist/ormconfig.js
+   ```
+
+4. Run migrations in production:
+   ```bash
+   npx typeorm migration:run -d ./dist/ormconfig.js
+   ```
+
+### Development Server
+
+Start the development server:
 ```bash
-$ npm install
+npm run start:dev
 ```
 
-## Running the app
+## API Documentation
 
-```bash
-# development
-$ npm run start
+The API documentation is available at `/api` when running the server locally.
 
-# watch mode
-$ npm run start:dev
+## Contributing
 
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+As this project is no longer maintained, contributions are not being accepted. However, you are welcome to fork the repository for educational or demonstration purposes.
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+This project is licensed under the UNLICENSED license - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [NestJS](https://nestjs.com/) - The framework used
+- [TypeORM](https://typeorm.io/) - The ORM used
+- [Expo](https://expo.dev/) - For push notification support
